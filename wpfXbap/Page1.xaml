@@ -1,0 +1,35 @@
+﻿<Page x:Class="wpfXbap.Page1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300"
+      Title="Page1" Height="600" Width="995" LostFocus="txbMaxNodeSt_LostFocus">
+    <Grid Width="996" Height="600">
+        <TextBlock Height="40" HorizontalAlignment="Left" Margin="252,12,0,0" Name="textBlock1" Text="Cops And Robbers THE GAME" VerticalAlignment="Top" Width="504" FontSize="24" TextAlignment="Center" FontWeight="Bold" FontStyle="Italic" />
+        <Grid Height="235" HorizontalAlignment="Left" Margin="137,85,0,0" Name="grid1" VerticalAlignment="Top" Width="309" Background="#FFEFC1C1">
+            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,44,0,0" Name="txbGraphWidth" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphWidth_LostFocus" DataContext="{Binding}" />
+            <Label Content="Szerokość grafu" Height="28" HorizontalAlignment="Left" Margin="28,44,0,0" Name="label4" VerticalAlignment="Top" />
+            <Label Content="Wysokość grafu" Height="28" HorizontalAlignment="Left" Margin="28,78,0,0" Name="label5" VerticalAlignment="Top" IsEnabled="True" />
+            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,78,0,0" Name="txbGraphHeight" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphHeight_LostFocus" />
+            <Button Content="Stwórz" Height="23" HorizontalAlignment="Left" Margin="110,188,0,0" Name="btnDrawGraph" VerticalAlignment="Top" Width="75" Click="btnDrawGraph_Click" />
+            <Label Content="Rodzaj" Height="28" HorizontalAlignment="Left" Margin="28,112,0,0" Name="label6" VerticalAlignment="Top" />
+            <ComboBox Height="23" HorizontalAlignment="Left" Margin="144,116,0,0" Name="cmbEdgeType" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}" />
+            <Label Content="Play yourself" Height="32" HorizontalAlignment="Left" Margin="78,6,0,0" Name="label1" VerticalAlignment="Top" Width="136" FontSize="16" FontWeight="Bold" />
+        </Grid>
+        <Grid Height="234" HorizontalAlignment="Left" Margin="562,86,0,0" Name="grid2" VerticalAlignment="Top" Width="422" Background="#FF65CB65">
+            <Label Content="Test section" Height="34" HorizontalAlignment="Left" Margin="90,11,0,0" Name="label2" VerticalAlignment="Top" Width="138" FontSize="16" FontWeight="Bold" />
+            <Label Content="Ilość wierzchołków" Height="26" HorizontalAlignment="Left" Margin="20,67,0,0" Name="label3" VerticalAlignment="Top" Width="125" />
+            <TextBox Height="32" HorizontalAlignment="Left" Margin="172,61,0,0" Name="txbNodeNumberMin" VerticalAlignment="Top" Width="80" Text="" LostFocus="txbNodeNumberMin_LostFocus" />
+            <TextBox Height="32" HorizontalAlignment="Left" Margin="296,61,0,0" Name="txbNodeNumberMax" Text="" VerticalAlignment="Top" Width="80" LostFocus="txbNodeNumberMax_LostFocus" />
+            <TextBox Height="29" HorizontalAlignment="Left" Margin="165,109,0,0" Name="txbMaxNodeSt" VerticalAlignment="Top" Width="125" LostFocus="txbMaxNodeSt_LostFocus" />
+            <Label Content="Ilość testów na graf" Height="29" HorizontalAlignment="Left" Margin="22,146,0,0" Name="label7" VerticalAlignment="Top" Width="123" />
+            <TextBox Height="29" HorizontalAlignment="Left" Margin="165,146,0,0" Name="txbTestNumber" VerticalAlignment="Top" Width="125" LostFocus="txbTestNumber_LostFocus" />
+            <Button Content="Start testing" Height="23" HorizontalAlignment="Left" Margin="121,181,0,0" Name="btnStartTests" VerticalAlignment="Top" Width="75" Click="btnStartTests_Click" />
+            <Label Content="od" Height="28" HorizontalAlignment="Left" Margin="142,65,0,0" Name="label8" VerticalAlignment="Top" />
+            <Label Content="do" Height="28" HorizontalAlignment="Left" Margin="266,65,0,0" Name="label9" VerticalAlignment="Top" />
+            <Label Content="max stopien wierz." Height="28" HorizontalAlignment="Left" Margin="22,110,0,0" Name="label10" VerticalAlignment="Top" />
+        </Grid>
+    </Grid>
+</Page>
