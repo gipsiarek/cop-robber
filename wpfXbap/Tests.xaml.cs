@@ -23,16 +23,20 @@ namespace wpfXbap
     {
 
         #region INITIALIZATION 
+        #region members of test class
         public Board board;
         public Robber robber;
         public List<Cop> cops;
-        public List<int> ocupied; //zajety
-        private int testNumber, nodenumberMin, nodenumberMax, nodeNumber, maxNodeSt;
+        public List<int> ocupied; 
+        private int testNumber, nodenumberMin, nodenumberMax, nodeNumber, maxNodeSt;    //info z kontrolek
+        private int txbIloscGoniacych, txbIloscGoniacychMax, txbBeaconRandom, txbAlfaBetaDepthMin, txbAlfaBetaDepthMax, txbGoOnTime;
+        private bool isGreedy, isRandomB, isAlphaBeta;
         public bool copMove;
         public List<outputClass> outputGreedy = new List<outputClass>();
         public List<outputClass> outputBeacon = new List<outputClass>();
         public List<outputClass> outputAlfaBeta = new List<outputClass>();
-        
+
+        #endregion
         public Tests()
         {
             try
@@ -48,15 +52,8 @@ namespace wpfXbap
         }
         private void test_OnLoad()
         {
-            testNumber = Convert.ToInt32(Application.Current.Properties["tTestNumber"]);
-            nodenumberMin = Convert.ToInt32(Application.Current.Properties["tNodeNumberMin"]);
-            nodenumberMax = Convert.ToInt32(Application.Current.Properties["tNodeNumberMax"]);
-            maxNodeSt = Convert.ToInt32(Application.Current.Properties["tMaxNodeSt"]);
-            //testNumber = 10;
-            //nodenumberMin = 50;
-            //nodenumberMax = 150;
-            //maxNodeSt = 5;
-            newDataForTest(1);
+            getDataFromProperties();
+           
            
             runRobberRun(testNumber);
             GridOutputGreedy.ItemsSource = outputGreedy;
@@ -64,12 +61,42 @@ namespace wpfXbap
             gridOutputAlfBet.ItemsSource = outputAlfaBeta;
 
         }
+
+        private void getDataFromProperties()
+        {
+            testNumber = Convert.ToInt32(Application.Current.Properties["tTestNumber"]);
+            nodenumberMin = Convert.ToInt32(Application.Current.Properties["tNodeNumberMin"]);
+            nodenumberMax = Convert.ToInt32(Application.Current.Properties["tNodeNumberMax"]);
+            maxNodeSt = Convert.ToInt32(Application.Current.Properties["tMaxNodeSt"]);
+            isGreedy = Convert.ToBoolean(Application.Current.Properties["tChbGreedy"]);
+            isRandomB = Convert.ToBoolean(Application.Current.Properties["tChbBeacon"]);
+            isAlphaBeta = Convert.ToBoolean(Application.Current.Properties["tChbAlfaBeta"]);
+            txbIloscGoniacych = Convert.ToInt32(Application.Current.Properties["tTbCopNr"]);
+            txbIloscGoniacychMax = Convert.ToInt32(Application.Current.Properties["tTbCopNrMax"]);
+            txbBeaconRandom = Convert.ToInt32(Application.Current.Properties["tTbRandNr"]);
+            txbGoOnTime = Convert.ToInt32(Application.Current.Properties["tTbgoOnTime"]);
+            txbAlfaBetaDepthMin = Convert.ToInt32(Application.Current.Properties["tTbAlfaDepthMin"]);
+            txbAlfaBetaDepthMax = Convert.ToInt32(Application.Current.Properties["tTbAlfaDepthMax"]);
+
+            if (nodenumberMin > nodenumberMax) nodenumberMax = nodenumberMin;
+            if (txbIloscGoniacych > txbIloscGoniacychMax) txbIloscGoniacychMax = txbIloscGoniacych;
+            if (txbAlfaBetaDepthMin > txbAlfaBetaDepthMax) txbAlfaBetaDepthMax = txbAlfaBetaDepthMin;
+        }
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Properties.Remove("tTestNumber");
             Application.Current.Properties.Remove("tNodeNumberMax");
+            Application.Current.Properties.Remove("tMaxNodeSt"); 
             Application.Current.Properties.Remove("tNodeNumberMin");
-            Application.Current.Properties.Remove("tMaxNodeSt");
+            Application.Current.Properties.Remove("tChbGreedy");
+            Application.Current.Properties.Remove("tChbBeacon");
+            Application.Current.Properties.Remove("tChbAlfaBeta");
+            Application.Current.Properties.Remove("tTbCopNr");
+            Application.Current.Properties.Remove("tTbCopNrMax");
+            Application.Current.Properties.Remove("tTbRandNr");
+            Application.Current.Properties.Remove("tTbgoOnTime");
+            Application.Current.Properties.Remove("tTbAlfaDepthMin");
+            Application.Current.Properties.Remove("tTbAlfaDepthMax");
             NavigationService.GetNavigationService(this).Navigate(new Uri("Page1.xaml", UriKind.RelativeOrAbsolute));
         }
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -81,68 +108,72 @@ namespace wpfXbap
         #endregion
 
         #region ALGORITHMS
+        ///// <summary>
+        ///// 1 greedy robber vs 1 greedy cop
+        ///// GREEDY - Find The Shortest path to robber when cop moves and longest path to cop when robber moves
+        ///// It uses the Dijkstra algorithm to find a path from all of the neighbors
+        ///// </summary>
+        //private bool greedy_1vs1()
+        //{
+        //    Cop cop = cops[0];
+        //    copMove = true;
+        //    int moves=0;
+        //    int maxMoves=board.verticies*4;
+        //    List<int> currentPath = new List<int>();
+        //    List<int> bestPath = new List<int>();
+        //    //List<List<int>> movesList = new List<List<int>>();
+        //    bool defeat=false;
+        //    while (!isCought(1) && moves != maxMoves)
+        //    {
+        //        if (copMove)
+        //        {
+        //            moves++;
+        //            currentPath.Clear(); bestPath.Clear();
+        //            if (cop.myNeighbors.Contains(robber.ocpupiedNode))
+        //                cop.move(robber.ocpupiedNode, board);
+        //            else
+        //            {
+        //                foreach (int item in cop.myNeighbors)
+        //                {
+        //                    currentPath = Dijkstra(cop.ocupiedNode, item, robber.ocpupiedNode);
+        //                    if (currentPath.Count < bestPath.Count || bestPath.Count == 0)
+        //                    {
+        //                        bestPath = currentPath;
+        //                    }
+        //                }
+        //                cop.move(bestPath[0], board);
+        //            }
+        //            copMove = false;
+        //        }
+        //        else
+        //        {
+        //            defeat = false;
+        //            currentPath.Clear(); bestPath.Clear();
+        //            if (robber.myNeighbors.Contains(cop.ocupiedNode))
+        //                defeat = true;
+        //            foreach (int item in robber.myNeighbors)
+        //            {
+        //                if (item != cop.ocupiedNode)
+        //                {
+        //                    currentPath = Dijkstra(robber.ocpupiedNode, item, cop.ocupiedNode);
+        //                    defeat = false;
+        //                    if (bestPath.Count < currentPath.Count)
+        //                        bestPath = currentPath;
+        //                }
+        //            }
+        //            if (!defeat)
+        //                robber.move(bestPath[0], board);
+        //            else robber.move(cop.ocupiedNode, board);
+        //            copMove = true;
+        //        }
+        //    }
+        //    outputClass o = new outputClass(whoseWin(isCought(1)), "greedy", 1, board.neighbor.Count, board.verticies, moves, maxMoves);
+        //    outputGreedy.Add(o);
+        //    return isCought(1); //one cop
+        //}
         /// <summary>
-        /// Find The Shortest path to robber when cop moves and longest path to cop when robber moves
-        /// It uses the Dijkstra algorithm to find a path from all of the neighbors
+        /// 1 greedy robber vs 'copnumber' of greedy cops
         /// </summary>
-        private bool greedy_1vs1()
-        {
-            Cop cop = cops[0];
-            copMove = true;
-            int moves=0;
-            int maxMoves=board.verticies*4;
-            List<int> currentPath = new List<int>();
-            List<int> bestPath = new List<int>();
-            //List<List<int>> movesList = new List<List<int>>();
-            bool defeat=false;
-            while (!isCought() && moves != maxMoves)
-            {
-                if (copMove)
-                {
-                    moves++;
-                    currentPath.Clear(); bestPath.Clear();
-                    if (cop.myNeighbors.Contains(robber.ocpupiedNode))
-                        cop.move(robber.ocpupiedNode, board);
-                    else
-                    {
-                        foreach (int item in cop.myNeighbors)
-                        {
-                            currentPath = Dijkstra(cop.ocupiedNode, item, robber.ocpupiedNode);
-                            if (currentPath.Count < bestPath.Count || bestPath.Count == 0)
-                            {
-                                bestPath = currentPath;
-                            }
-                        }
-                        cop.move(bestPath[0], board);
-                    }
-                    copMove = false;
-                }
-                else
-                {
-                    defeat = false;
-                    currentPath.Clear(); bestPath.Clear();
-                    if (robber.myNeighbors.Contains(cop.ocupiedNode))
-                        defeat = true;
-                    foreach (int item in robber.myNeighbors)
-                    {
-                        if (item != cop.ocupiedNode)
-                        {
-                            currentPath = Dijkstra(robber.ocpupiedNode, item, cop.ocupiedNode);
-                            defeat = false;
-                            if (bestPath.Count < currentPath.Count)
-                                bestPath = currentPath;
-                        }
-                    }
-                    if (!defeat)
-                        robber.move(bestPath[0], board);
-                    else robber.move(cop.ocupiedNode, board);
-                    copMove = true;
-                }
-            }
-            outputClass o = new outputClass(whoseWin(isCought()), "greedy", 1, board.neighbor.Count, board.verticies, moves, maxMoves);
-            outputGreedy.Add(o);
-            return isCought();
-        }
         private bool greedy_1vsMany(int copnumber)
         {
             copMove = true;
@@ -153,7 +184,7 @@ namespace wpfXbap
             List<int> bestPath = new List<int>();
             int pathLength = 0;
             bool defeat = false, freeway=true;
-            while (!isCought() && moves != maxMoves)
+            while (!isCought(copnumber) && moves != maxMoves)
             {
                 if (copMove)
                 {
@@ -166,6 +197,7 @@ namespace wpfXbap
                             cop.move(robber.ocpupiedNode, board);
                         else
                         {
+                            bestPath.Add(ocupied[cop.copId]);
                             foreach (int item in cop.myNeighbors)
                             {
                                 freeway = true;
@@ -248,9 +280,9 @@ namespace wpfXbap
                     pathLength = 0;
                 }
             }
-            outputClass o = new outputClass(whoseWin(isCought()), "greedy", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
+            outputClass o = new outputClass(whoseWin(isCought(copnumber)), "greedy", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
             outputGreedy.Add(o);
-            return isCought();
+            return isCought(copnumber);
         }
         /// <summary>
         /// Random beacon algorithm
@@ -268,7 +300,7 @@ namespace wpfXbap
             List<int> robberPath = new List<int>();
             bool freeway = true;
             int tmpTime = 0;
-            while (!isCought() && moves != maxMoves)
+            while (!isCought(copnumber) && moves != maxMoves)
             {
                 if (copMove)
                 {
@@ -281,6 +313,7 @@ namespace wpfXbap
                             cop.move(robber.ocpupiedNode, board);
                         else
                         {
+                            bestPath.Add(ocupied[cop.copId]);
                             foreach (int item in cop.myNeighbors)
                             {
                                 freeway = true;
@@ -295,8 +328,18 @@ namespace wpfXbap
                                     bestPath = currentPath;
                                 }
                             }
-                            cop.move(bestPath[0], board);
-                            ocupied[cop.copId] = bestPath[0];
+                            try
+                            {
+                                if (bestPath != null || bestPath.Count!=0)
+                                {
+                                    cop.move(bestPath[0], board);
+                                    ocupied[cop.copId] = bestPath[0];
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Random bekon ruch gliny" + ex.StackTrace);
+                            }
                         }
                     }
                     copMove = false;
@@ -328,10 +371,14 @@ namespace wpfXbap
                     copMove = true;
                 }
             }
-            outputClass o = new outputClass(whoseWin(isCought()), "Beacon", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
+            outputClass o = new outputClass(whoseWin(isCought(copnumber)), "Beacon", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
             outputBeacon.Add(o);
-            return isCought();
+            return isCought(copnumber);
         }
+        /// <summary>
+        /// function of robber running away with alpha beta and cop chaising him with greedy algorithm
+        /// </summary>
+        /// <param name="searchDepth">depth of alpha beta</param>
         private bool alphaBetavsGreedy(int searchDepth, int copnumber)
         {
             Cop cop = cops[0];
@@ -340,8 +387,7 @@ namespace wpfXbap
             int maxMoves = board.verticies * 2;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
-            Boolean defeat = false;
-            while (!isCought() && moves != maxMoves)
+            while (!isCought(copnumber) && moves != maxMoves)
             {
                 if (copMove)
                 {
@@ -365,157 +411,36 @@ namespace wpfXbap
                 }
                 else
                 {
-                    defeat = false;
                     currentPath.Clear(); bestPath.Clear();
-                    if (robber.myNeighbors.Contains(cop.ocupiedNode))
-                        defeat = true;
-                    int tmpMove = alphabeta(robber.ocpupiedNode, 3, -999, 999, true, cop.ocupiedNode, 3);
-                    if (tmpMove!=null)
-                        robber.move(tmpMove, board);
-                    else robber.move(cop.ocupiedNode, board);
+                    int tmpMove = alphabeta(robber.ocpupiedNode, searchDepth, -999, 999, true, cop.ocupiedNode, searchDepth);
+                    robber.move(tmpMove, board);
                     copMove = true;
                 }
             }
-            outputClass o = new outputClass(whoseWin(isCought()), "ABvsGreedy d=" + searchDepth.ToString(), copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
+            outputClass o = new outputClass(whoseWin(isCought(copnumber)), "ABvsGreedy d=" + searchDepth.ToString(), copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
             outputAlfaBeta.Add(o);
-            return isCought();
-        }
-
-
-        /// <summary>
-        /// find a shortest path from one of neighbors 'startnode' to 'finalnode', the root is 'from'
-        /// </summary>
-        public List<int> Dijkstra(int from, int startNode, int finalNode)
-        {
-            nodeNumber = board.neighbor.Count;
-            List<int> path = new List<int>();
-            List<List<int>> visited = new List<List<int>>(nodeNumber);
-            for (int i = 0; i < nodeNumber; i++)
-            {
-                visited.Add(new List<int>());
-            }
-            List<int> neighbors = board.findNeighbors(startNode);
-            Queue<int> q = new Queue<int>(nodeNumber);
-            int tmpNode;
-            visited[startNode].Add(from);
-            foreach (int i in neighbors)
-	        {
-                if (i == finalNode)
-                {
-                    path.Add(startNode);
-                    path.Add(finalNode);
-                    return path;
-                }
-                else
-                {
-                    q.Enqueue(i);
-                    visited[i].Add(startNode);
-                }
-            }
-            while (q.Count != 0)
-            {
-                tmpNode = q.Dequeue();
-                neighbors = board.findNeighbors(tmpNode);
-                foreach (int node in neighbors)
-                {
-                    if (node == finalNode)
-                    {
-                        q.Enqueue(node);
-                        visited[node].Add(tmpNode);
-                        createPathFromQueue(visited, out path, node, startNode);
-                        return path;
-                    }
-                    else
-                    {
-
-                        if (visited[node].Count == 0)
-                        {
-                            q.Enqueue(node);
-                            visited[node].Add(tmpNode);
-                        }
-                    }
-                }
-            }
-            return path;
-        }
-
-        /// <summary>
-        /// alpha beta algorithm :)
-        /// </summary>
-        /// <param name="node">start node for player which turn it is</param>
-        /// <param name="depth">current depth of search</param>
-        /// <returns>the best node to move to</returns>
-        private int alphabeta(int node, int depth, int alpha, int beta, bool player, int oponentNode, int startDepth)
-        {
-            int goNode=node;
-            if (depth==0 || node == oponentNode) //lub koniec gry
-            {
-                return getNodeValue(node, oponentNode, player);
-            }
-            
-            if (player == true)
-            {
-                foreach (int neighbor in board.findNeighbors(node))
-                {
-                    int alpha2 = Math.Max(alpha, alphabeta(oponentNode, depth - 1, alpha, beta, !player, neighbor, startDepth));
-                    if (alpha2 > alpha){
-                        goNode = neighbor;
-                        alpha = alpha2;
-                    }
-                    
-                    if (beta < alpha)
-                    {
-                        break;
-                    }
-                }
-                if (depth == startDepth)
-                    return goNode;
-                return alpha;
-            }
-            else
-            {
-                foreach (int neighbor in board.findNeighbors(oponentNode))
-                {
-                    beta = Math.Min(beta, alphabeta(oponentNode, depth - 1, alpha, beta, !player, neighbor, startDepth));
-                    if (beta<alpha)
-                    {
-                        break;
-                    }
-                }
-                return beta;                
-            }
-        }
-
-        private int getNodeValue(int node, int oponentNode, bool player)
-        {
-            List<int> length = new List<int>();
-            if (player)
-            {
-                if (node == oponentNode) return 400; 
-                length = Dijkstra(node, node, oponentNode);
-                return length.Count + board.findNeighbors(length[0]).Count;
-            }
-            else
-            {
-                if (node == oponentNode) return -400;
-                length = Dijkstra(node, node, oponentNode);
-                return -(length.Count + board.findNeighbors(length[0]).Count);
-                
-            }
+            return isCought(copnumber);
         }
        
         #endregion
 
         #region FUNCTIONS
-
-        public bool isCought()
+        /// <summary>
+        /// check if robber is cought
+        /// </summary>
+        /// <param name="copNumber">number of cops currently chaising robber</param>
+        public bool isCought(int copNumber)
         {
-            foreach(Cop cop in cops){
-            if (cop.ocupiedNode == robber.ocpupiedNode)
-                return true;
+            for (int i = 0; i < copNumber; i++ )
+            {
+                if (cops[i].ocupiedNode == robber.ocpupiedNode)
+                    return true;
             }
             return false;
         }
+        /// <summary>
+        /// returns a name of winner of the game
+        /// </summary>
         private string whoseWin(bool p)
         {
             if (p)
@@ -537,18 +462,20 @@ namespace wpfXbap
 			{
 			    cops.Add(new Cop(board.random.Next(nodenumber), board));
                 cops[i].copId = i;
-                ocupied.Add(0);
                 if (!ocupied.Contains(cops[i].ocupiedNode))
-                {                    
+                {
+                    ocupied.Add(cops[i].ocupiedNode);
                     cops[i].startNode = cops[i].ocupiedNode;
                 }
-                else do
+                else
                 {
-                    cops[i] = new Cop(board.random.Next(nodenumber), board);
-                    cops[i].startNode = cops[i].ocupiedNode;
-                } while (ocupied.Contains(cops[i].startNode));
-                 ocupied[i] = cops[i].startNode;
-
+                    do
+                    {
+                        cops[i] = new Cop(board.random.Next(nodenumber), board);
+                        cops[i].startNode = cops[i].ocupiedNode;
+                    } while (ocupied.Contains(cops[i].startNode));
+                    ocupied.Add(cops[i].startNode);
+                }
 			}
             foreach (Cop cop in cops)
             {
@@ -566,31 +493,46 @@ namespace wpfXbap
                 if (i > 100) newDataForTest(copnumber);
             } while (ocupied.Contains(robber.ocpupiedNode) && notSafe.Contains(robber.ocpupiedNode));
         }
+        /// <summary>
+        /// main loop for invoking test
+        /// </summary>
         private void runRobberRun(int testNumber)
         {
             for (int i = 0; i < testNumber; i++)
             {
-                newDataForTest(3);
+                newDataForTest(txbIloscGoniacychMax);
                 #region ROZNE ALGORYTMY
-                greedy_1vs1();
-                resetCops();
-                randomBeacon(10, 3, 1);
-                resetCops();
-                alphaBetavsGreedy(2, 1);
-                resetCops();
-                greedy_1vsMany(2);
-                resetCops();
-                randomBeacon(10, 3, 2);
-                resetCops();
-                alphaBetavsGreedy(3, 1);
-                resetCops();
-                greedy_1vsMany(3);
-                resetCops();
-                randomBeacon(10, 3, 3);
+                if (isGreedy)
+                {
+                    for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
+                    {
+                            greedy_1vsMany(tmp);
+                            resetCops();
+                    }
+                }
+                if (isRandomB)
+                {
+                    for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
+                    {
+                        randomBeacon(txbBeaconRandom, txbGoOnTime, tmp);
+                        resetCops();
+                    }
+                    
+                }
+                if (isAlphaBeta)
+                {
+                    for (int tmp = txbAlfaBetaDepthMin; tmp <= txbAlfaBetaDepthMax; tmp++)
+                    {
+                        alphaBetavsGreedy(tmp, 1); 
+                        resetCops();
+                    }
+                }
                 #endregion
-                
             }
         }
+        /// <summary>
+        /// reset players and cops to start positions for new test
+        /// </summary>
         private void resetCops()
         {
             foreach (Cop cop in cops)
@@ -599,9 +541,12 @@ namespace wpfXbap
                 ocupied[cop.copId] = cop.startNode;
                 cop.myNeighbors = board.findNeighbors(cop.startNode);
             }
-            robber.ocpupiedNode = robber.startNode;
+            robber.ocpupiedNode = robber.startNode;            
             robber.myNeighbors = board.findNeighbors(robber.startNode);
         }
+        /// <summary>
+        /// Convert the path from dijkstra algorithm to fit natural version from start node to finish node
+        /// </summary>
         private void createPathFromQueue(List<List<int>> visited, out List<int> path, int node, int startNode)
         {
             Queue<int> q = new Queue<int>();
@@ -661,14 +606,132 @@ namespace wpfXbap
             }
             return Dijkstra(robber.ocpupiedNode, robber.ocpupiedNode, bestNode);
         }
-       
+        /// <summary>
+        /// alpha beta algorithm :)
+        /// </summary>
+        /// <param name="node">start node for player which turn it is</param>
+        /// <param name="depth">current depth of search</param>
+        /// <returns>the best node to move to</returns>
+        private int alphabeta(int node, int depth, int alpha, int beta, bool player, int oponentNode, int startDepth)
+        {
+            int goNode = node;
+            if (depth == 0 || node == oponentNode) //lub koniec gry
+            {
+                return getNodeValue(node, oponentNode, player);
+            }
+
+            if (player == true)
+            {
+                foreach (int neighbor in board.findNeighbors(node))
+                {
+                    int alpha2 = Math.Max(alpha, alphabeta(oponentNode, depth - 1, alpha, beta, !player, neighbor, startDepth));
+                    if (alpha2 > alpha)
+                    {
+                        goNode = neighbor;
+                        alpha = alpha2;
+                    }
+
+                    if (beta < alpha)
+                    {
+                        break;
+                    }
+                }
+                if (depth == startDepth)
+                    return goNode;
+                return alpha;
+            }
+            else
+            {
+                foreach (int neighbor in board.findNeighbors(oponentNode))
+                {
+                    beta = Math.Min(beta, alphabeta(oponentNode, depth - 1, alpha, beta, !player, neighbor, startDepth));
+                    if (beta < alpha)
+                    {
+                        break;
+                    }
+                }
+                return beta;
+            }
+        }
+        /// <summary>
+        /// heuristic function to rank a node for alpha beta algoritm
+        /// </summary>
+        /// <param name="node">node of player</param>
+        private int getNodeValue(int node, int oponentNode, bool player)
+        {
+            List<int> length = new List<int>();
+            if (player)
+            {
+                if (node == oponentNode) return 999;
+                length = Dijkstra(node, node, oponentNode);
+                return length.Count;
+            }
+            else
+            {
+                if (node == oponentNode) return -999;
+                length = Dijkstra(node, node, oponentNode);
+                return -(length.Count);
+
+            }
+        }
+        /// <summary>
+        /// find a shortest path from one of neighbors 'startnode' to 'finalnode', the root is 'from'
+        /// </summary>
+        public List<int> Dijkstra(int from, int startNode, int finalNode)
+        {
+            nodeNumber = board.neighbor.Count;
+            List<int> path = new List<int>();
+            List<List<int>> visited = new List<List<int>>(nodeNumber);
+            for (int i = 0; i < nodeNumber; i++)
+            {
+                visited.Add(new List<int>());
+            }
+            List<int> neighbors = board.findNeighbors(startNode);
+            Queue<int> q = new Queue<int>(nodeNumber);
+            int tmpNode;
+            visited[startNode].Add(from);
+            foreach (int i in neighbors)
+            {
+                if (i == finalNode)
+                {
+                    path.Add(startNode);
+                    path.Add(finalNode);
+                    return path;
+                }
+                else
+                {
+                    q.Enqueue(i);
+                    visited[i].Add(startNode);
+                }
+            }
+            while (q.Count != 0)
+            {
+                tmpNode = q.Dequeue();
+                neighbors = board.findNeighbors(tmpNode);
+                foreach (int node in neighbors)
+                {
+                    if (node == finalNode)
+                    {
+                        q.Enqueue(node);
+                        visited[node].Add(tmpNode);
+                        createPathFromQueue(visited, out path, node, startNode);
+                        return path;
+                    }
+                    else
+                    {
+
+                        if (visited[node].Count == 0)
+                        {
+                            q.Enqueue(node);
+                            visited[node].Add(tmpNode);
+                        }
+                    }
+                }
+            }
+            return path;
+        }
         #endregion
-
-
-
     }
-
-
     #region KLASA DO OBSŁUGI DATAGRID
     /// <summary>
     /// Class created for presenting output of tests in datagrid
@@ -682,7 +745,6 @@ namespace wpfXbap
         private int m_verticies;
         private int m_moves;
         private int m_maxMoves;
-
 
         public string Winner
         {
@@ -725,5 +787,6 @@ namespace wpfXbap
             this.m_copNumber = copNumber;
         }
     }
-}
     #endregion
+}
+    

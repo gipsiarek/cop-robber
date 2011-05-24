@@ -3,20 +3,18 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
-      Title="Page1" Height="600" Width="995">
-    <Grid Width="996" Height="600">
+      mc:Ignorable="d" Title="Page1" d:DesignHeight="1035" d:DesignWidth="995">
+    <Grid Width="996" Height="1034">
         <TextBlock Height="40" HorizontalAlignment="Left" Margin="252,12,0,0" Name="textBlock1" Text="Cops And Robbers THE GAME" VerticalAlignment="Top" Width="504" FontSize="24" TextAlignment="Center" FontWeight="Bold" FontStyle="Italic" />
-        <Canvas Height="379" HorizontalAlignment="Left" Margin="34,118,0,0" Name="checkboard" VerticalAlignment="Top" Width="902" MouseDown="plansza_MouseDown" Background="AliceBlue"></Canvas>
-        <TextBox Height="23" HorizontalAlignment="Left" Margin="126,542,0,0" Name="txbPozycjaX" VerticalAlignment="Top" Width="120" AcceptsReturn="False" />
-        <TextBox Height="23" HorizontalAlignment="Left" Margin="279,540,0,0" Name="txbPozycjaY" VerticalAlignment="Top" Width="120" />
-        <Label Content="X" Height="28" HorizontalAlignment="Left" Margin="103,540,0,0" Name="label1" VerticalAlignment="Top" />
-        <Label Content="Y" Height="28" HorizontalAlignment="Left" Margin="256,540,0,0" Name="label2" VerticalAlignment="Top" />
-        <Label Content="Element" Height="28" HorizontalAlignment="Left" Margin="424,535,0,0" Name="label3" VerticalAlignment="Top" />
-        <TextBox Height="23" HorizontalAlignment="Left" Margin="494,540,0,0" Name="txbNrElementu" VerticalAlignment="Top" Width="120" />
-        <Label Content="Tura" Height="28" HorizontalAlignment="Left" Margin="398,74,0,0" Name="label4" VerticalAlignment="Top" Width="45" />
-        <TextBlock Height="23" HorizontalAlignment="Left" Margin="458,79,0,0" Name="lblTura" Text="TextBlock" VerticalAlignment="Top" />
-        <Button Content="Powrót" Height="23" HorizontalAlignment="Left" Margin="846,531,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
+        <Canvas Height="624" HorizontalAlignment="Left" Margin="60,67,0,0" Name="checkboard" VerticalAlignment="Top" Width="876" MouseDown="plansza_MouseDown" Background="AliceBlue"></Canvas>
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="124,703,0,0" Name="txbPozycjaX" VerticalAlignment="Top" Width="120" AcceptsReturn="False" />
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="294,703,0,0" Name="txbPozycjaY" VerticalAlignment="Top" Width="120" />
+        <Label Content="X" Height="28" HorizontalAlignment="Left" Margin="94,701,0,0" Name="label1" VerticalAlignment="Top" />
+        <Label Content="Y" Height="28" HorizontalAlignment="Left" Margin="271,701,0,0" Name="label2" VerticalAlignment="Top" />
+        <Label Content="Element" Height="28" HorizontalAlignment="Left" Margin="432,698,0,0" Name="label3" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="500,698,0,0" Name="txbNrElementu" VerticalAlignment="Top" Width="120" />
+        <Label Content="Tura" Height="28" HorizontalAlignment="Left" Margin="34,24,0,0" Name="label4" VerticalAlignment="Top" Width="45" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="94,29,0,0" Name="lblTura" Text="TextBlock" VerticalAlignment="Top" />
+        <Button Content="Powrót" Height="23" HorizontalAlignment="Left" Margin="786,703,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
     </Grid>
 </Page>

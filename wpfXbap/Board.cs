@@ -45,26 +45,35 @@ namespace wpfXbap
     #endregion
     public class Board : Page
     {
-        public List<List<int>> neighbor;
-        public List<Node> vertex;
-        public List<int> vertexTest;
-        public double distance;
+        #region members of board
         private int width;
         private int height;
         private int count;
         private string type;
+        public List<List<int>> neighbor;
+        public List<Node> vertex;
+        public List<int> vertexTest;
+        public double distance;
         public int verticies;
         public Random random = new Random(Convert.ToInt32(DateTime.Now.Ticks % 0x7FFFFFFF));
-
-        public Board(int vertical, int horizontal, string type)
+        #endregion
+        /// <summary>
+        /// constructor for game with user
+        /// </summary>
+        public Board(int vertical, int horizontal, string type, int boardWidth, int boardHeight)
         {
-            width = height = 15;
+            width = height = 17;
             distance = height*2+10;
             this.type = type;
-            generateUserGraph(vertical, horizontal);
+            generateUserGraph(vertical, horizontal, getStartPositionX(vertical, boardWidth), getStarPositionY(horizontal, boardHeight));
             count = vertical + horizontal;
             
         }
+        /// <summary>
+        /// constructor for test
+        /// get random values of nodes between 'nodeNumberMin' and nodeNumberMax'
+        /// </summary>
+        /// <param name="maxNodeSt">max degree of node</param>
         public Board(int nodeNumberMin, int nodeNumberMax, int maxNodeSt)
         {
             int nodeNumber = random.Next(nodeNumberMin, nodeNumberMax);
@@ -111,6 +120,9 @@ namespace wpfXbap
         #endregion
 
         #region DRAWING
+        /// <summary>
+        /// normal node
+        /// </summary>
         public Ellipse drawEllipse(Ellipse elly)
         {
             elly.Fill = Brushes.YellowGreen;
@@ -120,27 +132,32 @@ namespace wpfXbap
             elly.Height = height;
             return elly;
         }
-
         public Ellipse drawRobber(Ellipse elly)
         {
-            elly.Fill = Brushes.Red;
+
             elly.StrokeThickness = 2;
             elly.Stroke = Brushes.Black;
+            RadialGradientBrush radialGradient = new RadialGradientBrush();
+            radialGradient.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#FF450D0D"), 1.0));
+            radialGradient.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#FFF04646"), 0.224));
+            elly.Fill = radialGradient;
             elly.Width = width;
             elly.Height = height;
             return elly;
         }
-
         public Ellipse drawCop(Ellipse elly)
         {
-            elly.Fill = Brushes.Blue;
+
             elly.StrokeThickness = 2;
             elly.Stroke = Brushes.Black;
+            RadialGradientBrush radialGradient = new RadialGradientBrush();
+            radialGradient.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#FF0D1545"), 1.0));
+            radialGradient.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#FF3FCDCB"), 0.0));
+            elly.Fill = radialGradient;
             elly.Width = width;
             elly.Height = height;
             return elly;
         }
-
         public Line drawLine(int i, int j)
         {
             Line myLine = new Line();
@@ -156,11 +173,11 @@ namespace wpfXbap
             
         }
 
-#endregion
+        #endregion
 
         #region GENERATE GRAPH
         //generate the neighbor list and add vertex to graph
-        private void generateUserGraph(int v, int h)
+        private void generateUserGraph(int v, int h, int startPosX, int startPosY)
         {
             neighbor = new List<List<int>>();
            
@@ -172,7 +189,7 @@ namespace wpfXbap
             {
                 List<int> tmpList = new List<int>();
                 tmpList= generateNeighborC3(i, v, h);
-                vertex.Add(point((i % v) * distance, i / v * distance, i));
+                vertex.Add(point((i % v) * distance + startPosX, i / v * distance + startPosY, i));
                 foreach(int x in tmpList)
                     neighbor[i].Add(x);
             }
@@ -181,7 +198,7 @@ namespace wpfXbap
                 {
                     List<int> tmpList = new List<int>();
                     tmpList = generateNeighborC4(i, v, h);
-                    vertex.Add(point((i % v) * distance, i / v * distance, i));
+                    vertex.Add(point((i % v) * distance + startPosX, i / v * distance + startPosY, i));
                     foreach (int x in tmpList)
                         neighbor[i].Add(x);
                 }
@@ -190,7 +207,7 @@ namespace wpfXbap
                 {
                     List<int> tmpList = new List<int>();
                     tmpList = generateRandom(i, v, h);
-                    vertex.Add(point((i % v) * distance, i / v * distance, i));
+                    vertex.Add(point((i % v) * distance + startPosX, i / v * distance + startPosY, i));
                     foreach (int x in tmpList)
                     {
                         neighbor[i].Add(x);
@@ -202,17 +219,15 @@ namespace wpfXbap
         private void generateTestGraph(int nodeNumber, out int verticies, int maxNodeSt)
         {
             neighbor = new List<List<int>>();
-            vertexTest = new List<int>();
             verticies = 0;
             
             for (int i = 0; i < nodeNumber; i++)
             {
                 neighbor.Add(new List<int>());
-            }
+            }            
             for (int i = 0; i < nodeNumber; i++)
             {
-                List<int> tmpList = generateTest(i, nodeNumber, maxNodeSt);
-                vertexTest.Add(i);
+                List<int> tmpList = generateTest(i, nodeNumber, maxNodeSt, neighbor[i].Count);
                 foreach (int x in tmpList)
                 {
                     if (!neighbor[i].Contains(x))
@@ -298,30 +313,35 @@ namespace wpfXbap
             System.Threading.Thread.Sleep(100);
             return neigh;
         }
-        private List<int> generateTest(int i, int v, int maxNode)
-        {
-            int tmp = 0;
+        private List<int> generateTest(int i, int v, int maxNode, int connectionCount)
+        {            
             List<int> neigh = new List<int>();
-            do
+            try
             {
+                neigh.Add((i + 1) % v);
+                connectionCount++;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("bla bla bla" + i);
+            }
                 for (int x = 0; x < v; x++)
                 {
-                    if (x!=i && (random.Next()%900) < 100 )
+                    if (connectionCount >= maxNode)
+                        break;
+                    if (x!=i && (random.Next()%900) < 100 && neighbor[x].Count<(maxNode))
                     {
                         if (!neigh.Contains(x))
                         {
                             neigh.Add(x);
-                            tmp++;
+                            connectionCount++;
                         }
                     }
-                    if (tmp == maxNode)
-                        break;
                 }
-            } while (neigh.Count == 0);
-
             return neigh;           
         }
         #endregion
+
         #region FUNCTIONS
         public List<int> findNeighbors(int number)
         {
@@ -329,7 +349,17 @@ namespace wpfXbap
             list = neighbor[number];
             return list;
         }
-
+        /// <summary>
+        /// gets center of the screen to draw graph
+        /// </summary>
+        private int getStartPositionX(int nodes, int boardWidth)
+        {
+            return boardWidth / 2 - (nodes / 2 * (int)distance); 
+        }
+        private int getStarPositionY(int nodes, int boardHeight)
+        {
+            return boardHeight / 2 - (nodes / 2 * (int)distance); 
+        }
         private bool isCompact(List<List<int>> neighbor, int nodenumber)
         {
             int[] tmp = new int[nodenumber];

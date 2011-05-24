@@ -3,9 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      mc:Ignorable="d" 
-      d:DesignHeight="838" d:DesignWidth="1299"
-	Title="Tests">
+      mc:Ignorable="d" Title="Tests" d:DesignHeight="838" d:DesignWidth="1299">
 
     <Grid Name="Panel" Width="1284" Height="749">
         <Label Content="Wyniki !" Height="28" HorizontalAlignment="Left" Margin="618,12,0,0" Name="label1" VerticalAlignment="Top" />

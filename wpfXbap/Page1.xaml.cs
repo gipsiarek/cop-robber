@@ -46,12 +46,10 @@ namespace wpfXbap
 
         private void btnStartTests_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Properties.Add("tNodeNumberMin", txbNodeNumberMin.Text);
-            Application.Current.Properties.Add("tNodeNumberMax", txbNodeNumberMax.Text);
-            Application.Current.Properties.Add("tTestNumber", txbTestNumber.Text);
-            Application.Current.Properties.Add("tMaxNodeSt", txbMaxNodeSt.Text);
+            GetDataFromControl();
             NavigationService.GetNavigationService(this).Navigate(new Uri("Tests.xaml", UriKind.RelativeOrAbsolute));
         }
+
         #endregion
 
         #region EVENTS
@@ -154,7 +152,39 @@ namespace wpfXbap
             edgeTypeList.Add("random");
             cmbEdgeType.DataContext = edgeTypeList;
         }
+        /// <summary>
+        /// Geting all informations from checkboxes textboxes etc.
+        /// </summary>
+        private void GetDataFromControl()
+        {
+            if (txbNodeNumberMin.Text != "") Application.Current.Properties.Add("tNodeNumberMin", txbNodeNumberMin.Text);
+            else Application.Current.Properties.Add("tNodeNumberMin", 4);
+            if (txbNodeNumberMax.Text != "") Application.Current.Properties.Add("tNodeNumberMax", txbNodeNumberMax.Text);
+            else Application.Current.Properties.Add("tNodeNumberMax", 100);
+            if (txbTestNumber.Text != "") Application.Current.Properties.Add("tTestNumber", txbTestNumber.Text);
+            else Application.Current.Properties.Add("tTestNumber", 5);
+            if (txbMaxNodeSt.Text != "") Application.Current.Properties.Add("tMaxNodeSt", txbMaxNodeSt.Text);
+            else Application.Current.Properties.Add("tMaxNodeSt", 15);
+            if (txbIloscGoniacych.Text != "") Application.Current.Properties.Add("tTbCopNr", txbIloscGoniacych.Text);
+            else Application.Current.Properties.Add("tTbCopNr", 1);
+            if (txbIloscGoniacychMax.Text != "") Application.Current.Properties.Add("tTbCopNrMax", txbIloscGoniacychMax.Text);
+            else Application.Current.Properties.Add("tTbCopNrMax", 1);
+            if (txbBeaconRandom.Text != "") Application.Current.Properties.Add("tTbRandNr", txbBeaconRandom.Text);
+            else Application.Current.Properties.Add("tTbRandNr", 15);
+            if (txbAlfaBetaDepthMin.Text != "") Application.Current.Properties.Add("tTbAlfaDepthMin", txbAlfaBetaDepthMin.Text);
+            else Application.Current.Properties.Add("tTbAlfaDepthMin", 1);
+            if (txbAlfaBetaDepthMax.Text != "") Application.Current.Properties.Add("tTbAlfaDepthMax", txbAlfaBetaDepthMax.Text);
+            else Application.Current.Properties.Add("tTbAlfaDepthMax", 3);
+            if (txbCzasMarszu.Text != "") Application.Current.Properties.Add("tTbgoOnTime", txbCzasMarszu.Text);
+            else Application.Current.Properties.Add("tTbgoOnTime", 3);
+            
+            Application.Current.Properties.Add("tChbGreedy", chbGreedy.IsChecked);
+            Application.Current.Properties.Add("tChbBeacon", chbBeacon.IsChecked);
+            Application.Current.Properties.Add("tChbAlfaBeta", chbAlfaBeta.IsChecked);
 
+            
+
+        }
         #endregion
 
 

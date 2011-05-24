@@ -51,7 +51,7 @@ namespace wpfXbap
             gHeight = Convert.ToInt32(Application.Current.Properties["gHeight"]);
             gType = Convert.ToString(Application.Current.Properties["gType"]);
             nodenumber = gHeight * gWidth;
-            board = new Board(gWidth, gHeight, gType);
+            board = new Board(gWidth, gHeight, gType, (int)checkboard.Width, (int)checkboard.Height);
 
 
             foreach (Node node in board.vertex)
@@ -98,7 +98,6 @@ namespace wpfXbap
                             cop.myNeighbors = board.findNeighbors(cop.myNode.number);
                             MessageBox.Show("tak daleko nie dobiegnę...");
                         }
-
                     }
                     else
                     {
@@ -223,7 +222,9 @@ namespace wpfXbap
              Application.Current.Properties.Remove("gType");
              NavigationService.GetNavigationService(this).Navigate(new Uri("Page1.xaml", UriKind.RelativeOrAbsolute));
          }
-
+        /// <summary>
+        /// loop for manage rober
+        /// </summary>
          public void RobberMove()
          {
              List<int> away = new List<int>();
