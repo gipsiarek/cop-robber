@@ -27,6 +27,7 @@ namespace wpfXbap
             {
                 InitializeComponent();
                 edgeTypeList();
+                algorithmSelection();
             }
             catch (Exception ex)
             {
@@ -41,6 +42,7 @@ namespace wpfXbap
             Application.Current.Properties.Add("gWidth", txbGraphWidth.Text);
             Application.Current.Properties.Add("gHeight", txbGraphHeight.Text);
             Application.Current.Properties.Add("gType",  cmbEdgeType.SelectedValue.ToString());
+            Application.Current.Properties.Add("gAlgorithm", cmbAlgorithm.SelectedValue.ToString());
             NavigationService.GetNavigationService(this).Navigate(new Uri("UserGame.xaml", UriKind.RelativeOrAbsolute));
         }
 
@@ -143,7 +145,7 @@ namespace wpfXbap
 
             return ret;
         }
-        /// Item source for combobox
+        /// Item source with graphs types for combobox
         private void edgeTypeList()
         {
             List<string> edgeTypeList = new List<string>();
@@ -151,6 +153,16 @@ namespace wpfXbap
             edgeTypeList.Add("c4");
             edgeTypeList.Add("random");
             cmbEdgeType.DataContext = edgeTypeList;
+        }
+        //Item source with robber algoriths for combobox
+        private void algorithmSelection()
+        {
+            List<string> algorithms = new List<string>();
+            algorithms.Add("zachłanny");
+            algorithms.Add("zachłanny z Dijkstrą");
+            algorithms.Add("latarnie morskie");
+            algorithms.Add("alfa-beta");
+            cmbAlgorithm.DataContext = algorithms;
         }
         /// <summary>
         /// Geting all informations from checkboxes textboxes etc.

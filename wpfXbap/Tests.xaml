@@ -3,15 +3,20 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      mc:Ignorable="d" Title="Tests" d:DesignHeight="838" d:DesignWidth="1299">
-
-    <Grid Name="Panel" Width="1284" Height="749">
-        <Label Content="Wyniki !" Height="28" HorizontalAlignment="Left" Margin="618,12,0,0" Name="label1" VerticalAlignment="Top" />
-        <DataGrid AutoGenerateColumns="True" Height="333" HorizontalAlignment="Left" Margin="5,64,0,0" Name="GridOutputGreedy" VerticalAlignment="Top" Width="422" />
-        <DataGrid AutoGenerateColumns="True" Height="333" HorizontalAlignment="Right" Margin="0,64,428,0" Name="GridOutputBeacon" VerticalAlignment="Top" Width="422" />
-        <DataGrid AutoGenerateColumns="True" Height="333" HorizontalAlignment="Right" Margin="0,64,0,0" Name="gridOutputAlfBet" VerticalAlignment="Top" Width="422" />
-        <Button Content="Powrót" Height="23" HorizontalAlignment="Right" Margin="0,403,509,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
-        <Button Content="Pokaz wykres" Height="23" HorizontalAlignment="Left" Margin="595,403,0,0" Name="button2" VerticalAlignment="Top" Width="87" Click="button2_Click" />
-    </Grid>
-    
+      mc:Ignorable="d" Title="Tests" d:DesignHeight="952" d:DesignWidth="1299">
+    <ScrollViewer>
+        <Grid Name="Panel" Width="1284" Height="976">
+        <Label Content="Wyniki !" Height="28" HorizontalAlignment="Left" Margin="534,12,0,0" Name="label1" VerticalAlignment="Top" />
+        <DataGrid AutoGenerateColumns="True" Height="400" HorizontalAlignment="Left" Margin="31,64,0,0" Name="GridOutputGreedy" VerticalAlignment="Top" Width="600" />
+        <DataGrid AutoGenerateColumns="True" Height="400" HorizontalAlignment="Right" Margin="0,64,21,0" Name="GridOutputBeacon" VerticalAlignment="Top" Width="600" />
+        <DataGrid AutoGenerateColumns="True" Height="400" HorizontalAlignment="Right" Margin="0,512,21,0" Name="gridOutputAlfBet" VerticalAlignment="Top" Width="600" />
+        <Button Content="Powrót" Height="23" HorizontalAlignment="Right" Margin="0,13,478,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
+        <Button Content="Pokaz wykres" Height="23" HorizontalAlignment="Left" Margin="638,13,0,0" Name="button2" VerticalAlignment="Top" Width="87" Click="button2_Click" />
+            <DataGrid AutoGenerateColumns="True" Height="400" HorizontalAlignment="Right" Margin="0,512,653,0" Name="gridGreedyDumb" VerticalAlignment="Top" Width="600" />
+            <Label Content="Zachłanny z Dijkstrą" Height="28" HorizontalAlignment="Left" Margin="262,30,0,0" Name="label2" VerticalAlignment="Top" FontWeight="Bold" />
+            <Label Content="Latarnie Morskie" Height="28" HorizontalAlignment="Left" Margin="879,30,0,0" Name="label3" VerticalAlignment="Top" FontWeight="Bold" />
+            <Label Content="Zachłanny bez ulepszeń" Height="28" HorizontalAlignment="Left" Margin="262,478,0,0" Name="label4" VerticalAlignment="Top" FontWeight="Bold" />
+            <Label Content="Alfa Beta" Height="28" HorizontalAlignment="Left" Margin="879,478,0,0" Name="label5" VerticalAlignment="Top" FontWeight="Bold" />
+        </Grid>
+    </ScrollViewer>
 </Page>

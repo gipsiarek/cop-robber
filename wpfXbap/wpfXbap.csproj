@@ -95,7 +95,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Board.cs" />
-    <Compile Include="Algorithms.cs" />
     <Compile Include="Cop.cs" />
     <Compile Include="XYPlot.xaml.cs">
       <DependentUpon>XYPlot.xaml</DependentUpon>

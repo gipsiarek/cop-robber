@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" Title="Page1" d:DesignHeight="1035" d:DesignWidth="995">
+    <ScrollViewer>
     <Grid Width="996" Height="1034">
         <TextBlock Height="40" HorizontalAlignment="Left" Margin="252,12,0,0" Name="textBlock1" Text="Cops And Robbers THE GAME" VerticalAlignment="Top" Width="504" FontSize="24" TextAlignment="Center" FontWeight="Bold" FontStyle="Italic" />
         <Canvas Height="624" HorizontalAlignment="Left" Margin="60,67,0,0" Name="checkboard" VerticalAlignment="Top" Width="876" MouseDown="plansza_MouseDown" Background="AliceBlue"></Canvas>
@@ -17,4 +18,5 @@
         <TextBlock Height="23" HorizontalAlignment="Left" Margin="94,29,0,0" Name="lblTura" Text="TextBlock" VerticalAlignment="Top" />
         <Button Content="Powrót" Height="23" HorizontalAlignment="Left" Margin="786,703,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
     </Grid>
+    </ScrollViewer>
 </Page>

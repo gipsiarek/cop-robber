@@ -323,7 +323,7 @@ namespace wpfXbap
             }
             catch (Exception e)
             {
-                MessageBox.Show("bla bla bla" + i);
+                MessageBox.Show("bla bla bla" + i + e);
             }
                 for (int x = 0; x < v; x++)
                 {

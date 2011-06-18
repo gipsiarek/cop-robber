@@ -20,6 +20,8 @@ namespace wpfXbap
         public List<int> myNeighbors;
         public int ocpupiedNode;
         public int startNode;
+        public int movesSoFar;
+        public List<int> myPath;
         /// <summary>
         /// creates ellipse on a board in Point and gives it number i
         /// </summary>
@@ -28,6 +30,8 @@ namespace wpfXbap
             myNode = new Node(node);
             myNeighbors = new List<int>();
             myNode.number = i;
+            movesSoFar = 0;
+            myPath = new List<int>();
             board.pointRobber(node, myNode);
             myNeighbors = board.findNeighbors(myNode.number);
         }
@@ -36,7 +40,9 @@ namespace wpfXbap
         /// </summary>
         public Robber(int startNode, Board board)
         {
+            myPath = new List<int>();
             ocpupiedNode = startNode;
+            movesSoFar = 0;
             myNeighbors = new List<int>();
             myNeighbors = board.findNeighbors(ocpupiedNode);
         }
@@ -48,6 +54,7 @@ namespace wpfXbap
         public void move(int node, Board board)
         {
             ocpupiedNode = node;
+            movesSoFar++;
             myNeighbors = board.findNeighbors(ocpupiedNode);
         }
     }

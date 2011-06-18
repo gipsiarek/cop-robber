@@ -26,6 +26,9 @@ namespace wpfXbap
         Cop cop;
         int clickedElement, nodenumber;
         bool copTurn, robberPlaced, copPlaced;
+        int gWidth, gHeight;
+        string gType, gAlgorithm;
+
         public UserGame()
         {
             try
@@ -45,11 +48,10 @@ namespace wpfXbap
         private void UserGame_OnLoad()
         {
             checkboard.Children.Clear();
-            int gWidth, gHeight;
-            string gType;
             gWidth = Convert.ToInt32(Application.Current.Properties["gWidth"]);
             gHeight = Convert.ToInt32(Application.Current.Properties["gHeight"]);
             gType = Convert.ToString(Application.Current.Properties["gType"]);
+            gAlgorithm = Convert.ToString(Application.Current.Properties["gAlgorithm"]);
             nodenumber = gHeight * gWidth;
             board = new Board(gWidth, gHeight, gType, (int)checkboard.Width, (int)checkboard.Height);
 
@@ -150,6 +152,7 @@ namespace wpfXbap
             Application.Current.Properties.Remove("gWidth");
             Application.Current.Properties.Remove("gHeight");
             Application.Current.Properties.Remove("gType");
+            Application.Current.Properties.Remove("gAlgorithm");
             NavigationService.GetNavigationService(this).Navigate(new Uri("Page1.xaml", UriKind.RelativeOrAbsolute));
         } 
         #endregion
@@ -220,6 +223,7 @@ namespace wpfXbap
              Application.Current.Properties.Remove("gWidth");
              Application.Current.Properties.Remove("gHeight");
              Application.Current.Properties.Remove("gType");
+             Application.Current.Properties.Remove("gAlgorithm");
              NavigationService.GetNavigationService(this).Navigate(new Uri("Page1.xaml", UriKind.RelativeOrAbsolute));
          }
         /// <summary>
@@ -227,99 +231,33 @@ namespace wpfXbap
         /// </summary>
          public void RobberMove()
          {
-             List<int> away = new List<int>();
-             int currentPath = 0, bestPath = 0, nodetoGo = 0;
-             checkboard.Children.Remove(robber.myNode.elly);
-             robber.myNeighbors = board.findNeighbors(robber.myNode.number);
+             int nodetoGo = 0;
 
-             foreach (int item in robber.myNeighbors)
-             {
-                 if (item != cop.myNode.number)
-                 {
-                     away = Dijkstra(robber.myNode.number, item, cop.myNode.number);
-                     currentPath = away.Count();
-                     if (bestPath < currentPath)
-                     {
-                         bestPath = currentPath;
-                         nodetoGo = away[0];
-                     }
-                 }
+             robber.ocpupiedNode = robber.myNode.number;
+             cop.ocupiedNode = cop.myNode.number;
+             robber.myNeighbors = board.findNeighbors(robber.myNode.number);
+             if(gAlgorithm.Equals("zachłanny")){
+                 nodetoGo = Tests.robber_moves_greedy_dumb(cop, robber);
+             } else if(gAlgorithm.Equals("alfa-beta")){
+                nodetoGo = Tests.alphabeta(robber.ocpupiedNode, 3, -999, 999, true, cop.ocupiedNode, 4, board);
+             } else if(gAlgorithm.Equals("latarnie morskie")){
+                 nodetoGo = Tests.robber_moves_randomBeacon(board, 10, 5, robber, cop);
+             } else {       //zachłanny z Dijkstrą
+                 nodetoGo = Tests.robber_moves_greedy_dijkstra(1, board, cop, robber);
              }
+
+
+             List<int> away = new List<int>();
+             
+             checkboard.Children.Remove(robber.myNode.elly);
+            
              robber.myNode.number = nodetoGo;
              string name = "node" + nodetoGo.ToString();
              board.pointRobber(findPoint(name), robber.myNode);
              checkboard.Children.Add(robber.myNode.elly);
 
          }
-         public List<int> Dijkstra(int from, int startNode, int finalNode)
-         {
-             List<int> path = new List<int>();
-             List<List<int>> visited = new List<List<int>>(nodenumber);
-             for (int i = 0; i < nodenumber; i++)
-             {
-                 visited.Add(new List<int>());
-             }
-             List<int> neighbors = board.findNeighbors(startNode);
-             Queue<int> q = new Queue<int>(nodenumber);
-             int tmpNode;
-             visited[startNode].Add(from);
-             foreach (int i in neighbors)
-             {
-                 if (i == finalNode)
-                 {
-                     path.Add(startNode);
-                     path.Add(finalNode);
-                     return path;
-                 }
-                 else
-                 {
-                     q.Enqueue(i);
-                     visited[i].Add(startNode);
-                 }
-             }
-             while (q.Count != 0)
-             {
-                 tmpNode = q.Dequeue();
-                 neighbors = board.findNeighbors(tmpNode);
-                 foreach (int node in neighbors)
-                 {
-                     if (node == finalNode)
-                     {
-                         q.Enqueue(node);
-                         visited[node].Add(tmpNode);
-                         createPathFromQueue(visited, out path, node, startNode);
-                         return path;
-                     }
-                     else
-                     {
-                         if (visited[node].Count == 0)
-                         {
-                             q.Enqueue(node);
-                             visited[node].Add(tmpNode);
-                         }
-                     }
-                 }
-             }
 
-             return path;
-         }
-         private void createPathFromQueue(List<List<int>> visited, out List<int> path, int node, int startNode)
-         {
-             Queue<int> q = new Queue<int>();
-             Queue<int> qtemp = new Queue<int>();
-             q.Enqueue(node);
-             while (true)
-             {
-                 node = visited[node][0];
-                 q.Enqueue(node);
-                 if (node == startNode)
-                 {
-                     break;
-                 }
-             }
-             path = q.Reverse().ToList<int>();
-
-         }
         
         #endregion
 
