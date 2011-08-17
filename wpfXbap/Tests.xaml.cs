@@ -22,21 +22,26 @@ namespace wpfXbap
     public partial class Tests : Page
     {
 
-        #region INITIALIZATION 
+        #region INITIALIZATION
         #region members of test class
         public static Board board;
         public static Robber robber;
         public static List<Cop> cops;
         public static List<int> ocupied;
-        public int testNumber;
+        public int testNumber, currentTest;
+        public string classOfGraph;
         private static int nodenumberMin, nodenumberMax, nodeNumber, maxNodeSt;    //info z kontrolek
         private int txbIloscGoniacych, txbIloscGoniacychMax, txbBeaconRandom, txbAlfaBetaDepthMin, txbAlfaBetaDepthMax, txbGoOnTime;
-        private bool isGreedy, isRandomB, isAlphaBeta;
+        private int txbTreeWidth, txbTreeDepth;
+        private bool isGreedy, isRandomB, isAlphaBeta, isMCTS;
+        private Tree<Data> MCTSTree;
         public bool copMove;
-        public List<outputClass> outputGreedyDijkstra = new List<outputClass>();
-        public List<outputClass> outputGreedyDumb = new List<outputClass>();
-        public List<outputClass> outputBeacon = new List<outputClass>();
-        public List<outputClass> outputAlfaBeta = new List<outputClass>();
+        public static List<outputClass> outputGreedyDijkstra;
+        public static List<outputClass> outputGreedyDumb;
+        public static List<outputClass> outputBeacon;
+        public static List<outputClass> outputAlfaBeta;
+        public static List<outputClass> outputMCTS ;
+        public int iterGreedyDumb, iterGreedyDijkstra, iterRandomBeacon, iterAlfaBeta, iterMCTS;
 
         #endregion
         public Tests()
@@ -45,6 +50,7 @@ namespace wpfXbap
             {
                 InitializeComponent();
                 test_OnLoad();
+                
             }
             catch (Exception ex)
             {
@@ -55,13 +61,22 @@ namespace wpfXbap
         private void test_OnLoad()
         {
             getDataFromProperties();
-           
-           
-            runRobberRun(testNumber);
+            if (!Convert.ToBoolean(Application.Current.Properties["FromXYPlot"]))
+            {
+                MCTSTree = new Tree<Data>();
+                outputGreedyDijkstra = new List<outputClass>();
+                outputGreedyDumb = new List<outputClass>();
+                outputBeacon = new List<outputClass>();
+                outputAlfaBeta = new List<outputClass>();
+                outputMCTS = new List<outputClass>();
+
+                runRobberRun(testNumber);
+            }
             GridOutputGreedy.ItemsSource = outputGreedyDijkstra;
             GridOutputBeacon.ItemsSource = outputBeacon;
             gridOutputAlfBet.ItemsSource = outputAlfaBeta;
             gridGreedyDumb.ItemsSource = outputGreedyDumb;
+            gridOutputMCTS.ItemsSource = outputMCTS;
 
         }
 
@@ -69,7 +84,7 @@ namespace wpfXbap
         {
             Application.Current.Properties.Remove("tTestNumber");
             Application.Current.Properties.Remove("tNodeNumberMax");
-            Application.Current.Properties.Remove("tMaxNodeSt"); 
+            Application.Current.Properties.Remove("tMaxNodeSt");
             Application.Current.Properties.Remove("tNodeNumberMin");
             Application.Current.Properties.Remove("tChbGreedy");
             Application.Current.Properties.Remove("tChbBeacon");
@@ -80,12 +95,17 @@ namespace wpfXbap
             Application.Current.Properties.Remove("tTbgoOnTime");
             Application.Current.Properties.Remove("tTbAlfaDepthMin");
             Application.Current.Properties.Remove("tTbAlfaDepthMax");
+            Application.Current.Properties.Remove("tTreeDepth");
+            Application.Current.Properties.Remove("tTreeWidth");
+            Application.Current.Properties.Remove("tChbMCTS");
+            Application.Current.Properties.Remove("FromXYPlot");
             NavigationService.GetNavigationService(this).Navigate(new Uri("Page1.xaml", UriKind.RelativeOrAbsolute));
         }
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             XYPlot plot = new XYPlot();
-            plot.Visibility = System.Windows.Visibility.Visible;
+            NavigationService.GetNavigationService(this).Navigate(new Uri("XYPlot.xaml", UriKind.RelativeOrAbsolute));
+            //plot.Visibility = System.Windows.Visibility.Visible;
         }
 
         #endregion
@@ -97,13 +117,13 @@ namespace wpfXbap
         ///// </summary>
         private bool greedy_dumb_1vsMany(int copnumber)
         {
-            
+
             copMove = true;
             int moves = 0;
             int maxMoves = board.verticies * 4;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
-            //List<List<int>> movesList = new List<List<int>>();
+            iterGreedyDumb = 0;
             while (!isCought(copnumber) && moves != maxMoves)
             {
                 if (copMove)
@@ -118,9 +138,9 @@ namespace wpfXbap
                     copMove = true;
                 }
             }
-            outputClass o = new outputClass(whoseWin(isCought(copnumber)), "greedy-dumb", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
+            outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "greedy-dumb", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves, iterGreedyDumb);
             outputGreedyDumb.Add(o);
-            return isCought(copnumber); 
+            return isCought(copnumber);
         }
         /// <summary>
         /// 1 greedy robber vs 'copnumber' of greedy cops
@@ -129,9 +149,10 @@ namespace wpfXbap
         {
             copMove = true;
             int moves = 0;
-            int maxMoves = board.verticies *4 ;
+            int maxMoves = board.verticies * 4;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
+            iterGreedyDijkstra = 0;
             while (!isCought(copnumber) && moves != maxMoves)
             {
                 if (copMove)
@@ -143,14 +164,14 @@ namespace wpfXbap
                 else
                 {
                     currentPath.Clear(); bestPath.Clear();
-                    robber.move(robber_moves_greedy_dijkstra(copnumber, currentPath, bestPath), board);                    
+                    robber.move(robber_moves_greedy_dijkstra(copnumber, currentPath, bestPath), board);
                     copMove = true;
                 }
             }
-            outputClass o = new outputClass(whoseWin(isCought(copnumber)), "greedy", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
+            outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "greedy", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves, iterGreedyDijkstra);
             outputGreedyDijkstra.Add(o);
             return isCought(copnumber);
-        } 
+        }
         /// <summary>
         /// Random beacon algorithm
         /// </summary>
@@ -165,6 +186,7 @@ namespace wpfXbap
             List<int> bestPath = new List<int>();
             List<int> robberPath = new List<int>();
             int tmpTime = 1;
+            iterRandomBeacon = 0;
             while (!isCought(copnumber) && moves != maxMoves)
             {
                 if (copMove)
@@ -174,8 +196,8 @@ namespace wpfXbap
                     copMove = false;
                 }
                 else
-                {                 
-                    if ((tmpTime == goOnTime || tmpTime == 1  || robberPath.Count<=tmpTime))
+                {
+                    if ((tmpTime == goOnTime || tmpTime == 1 || robberPath.Count <= tmpTime))
                     {
                         tmpTime = 1;
                         robberPath = getBeaconNodes(r, copnumber);
@@ -184,6 +206,7 @@ namespace wpfXbap
                     }
                     else
                     {
+                        iterRandomBeacon++;
                         robber.move(robberPath[tmpTime], board);
                         tmpTime++;
                     }
@@ -191,7 +214,7 @@ namespace wpfXbap
                     copMove = true;
                 }
             }
-            outputClass o = new outputClass(whoseWin(isCought(copnumber)), "Beacon", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
+            outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "Beacon", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves,iterRandomBeacon);
             outputBeacon.Add(o);
             return isCought(copnumber);
         }
@@ -207,6 +230,7 @@ namespace wpfXbap
             int maxMoves = board.verticies * 2;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
+            iterAlfaBeta = 0; ;
             while (!isCought(copnumber) && moves != maxMoves)
             {
                 if (copMove)
@@ -223,11 +247,63 @@ namespace wpfXbap
                     copMove = true;
                 }
             }
-            outputClass o = new outputClass(whoseWin(isCought(copnumber)), "ABvsGreedy d=" + searchDepth.ToString(), copnumber, board.neighbor.Count, board.verticies, moves, maxMoves);
+            outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "ABvsGreedy d=" + searchDepth.ToString(), copnumber, board.neighbor.Count, board.verticies, moves, maxMoves, iterAlfaBeta);
             outputAlfaBeta.Add(o);
             return isCought(copnumber);
         }
-       
+        /// <summary>
+        /// cop with greedy algorithm and monte carlo tree search with propagation for robber
+        /// </summary>
+        private bool MCTS(int treeWidth, int searchDepth, int copnumber)
+        {
+            copMove = true;
+            int moves = 0;
+            int maxMoves = board.verticies * 4;
+            List<int> currentPath = new List<int>();
+            List<int> bestPath = new List<int>();
+            Tree<Node<Data>> MCTSTree = null;
+            int counter = 0;
+            iterMCTS = 0;
+            while (!isCought(copnumber) && moves != maxMoves)
+            {
+                if (copMove)
+                {
+                    moves++;
+                    cops_moves_greedy_dijkstra(copnumber, currentPath, bestPath);
+                    copMove = false;
+                }
+                else
+                {
+                    if (MCTSTree == null || counter == 0)
+                    {
+                        counter = txbTreeDepth - 1;
+                        Data data = new Data();
+                        for (int i = 0; i < copnumber; i++)
+                        {
+                            data.CopPos[i] = cops[i].ocupiedNode;
+                        }
+                        data.RobberPos = robber.ocpupiedNode;
+                        MCTSTree = new Tree<Node<Data>>(simulateGame(treeWidth, searchDepth, copnumber, new Node<Data>(null, data)));
+                        MCTSTree.node = PropagateChildrenProbability(MCTSTree.node);
+                        robber.move(getBestTreeNode(MCTSTree, out MCTSTree), board);
+                        copMove = true;
+                    }
+                    else
+                    {
+                        iterMCTS++;
+                        robber.move(getBestTreeNode(MCTSTree, out MCTSTree), board);
+                        copMove = true;
+                        counter--;
+                    }
+                }
+            }
+
+            outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "MCTS", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves,iterMCTS);
+            outputMCTS.Add(o);
+            return isCought(copnumber);
+        }
+
+    
         #endregion
 
         #region FUNCTIONS
@@ -278,10 +354,11 @@ namespace wpfXbap
                 }
             }
         }
-        public static int robber_moves_greedy_dumb(int copnumber)
+        public int robber_moves_greedy_dumb(int copnumber)
         {
             foreach (int item in robber.myNeighbors)
             {
+                iterGreedyDumb++;
                 if (!ocupied.Contains(item))
                 {
                     return item;
@@ -311,7 +388,10 @@ namespace wpfXbap
             foreach (Cop cop in cops)
             {
                 if (robber.myNeighbors.Contains(cop.ocupiedNode))
+                {
                     defeat = true;
+                    iterGreedyDijkstra++;
+                }
             }
             foreach (int item in robber.myNeighbors)
             {
@@ -326,6 +406,7 @@ namespace wpfXbap
 
                     foreach (List<int> tmp in currentPathToCops)
                     {
+                        iterGreedyDijkstra++;
                         if (pathLength == 0 || pathLength < tmp.Count)
                         {
                             pathLength = tmp.Count;
@@ -351,7 +432,7 @@ namespace wpfXbap
             }
             return -1;
         }
-        public static int robber_moves_greedy_dijkstra(int copnumber, Board board, Cop cop, Robber robber )
+        public static int robber_moves_greedy_dijkstra(int copnumber, Board board, Cop cop, Robber robber)
         {
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
@@ -360,7 +441,7 @@ namespace wpfXbap
             int pathLength = 0;
             if (robber.myNeighbors.Contains(cop.ocupiedNode))
                 defeat = true;
-            
+
             foreach (int item in robber.myNeighbors)
             {
                 if (item != cop.myNode.number)
@@ -421,6 +502,7 @@ namespace wpfXbap
                     }
                     foreach (List<int> tmp in currentPathToCops)
                     {
+                        iterRandomBeacon++;
                         if (pathLength == 0 || pathLength > tmp.Count)
                         {
                             pathLength = tmp.Count;
@@ -437,7 +519,8 @@ namespace wpfXbap
             }
             return Dijkstra(robber.ocpupiedNode, robber.ocpupiedNode, bestNode);
         }
-        public static int robber_moves_randomBeacon(Board board, int r, int goOnTime, Robber robber, Cop cop){
+        public static int robber_moves_randomBeacon(Board board, int r, int goOnTime, Robber robber, Cop cop)
+        {
             int node = 0;
             if ((robber.movesSoFar == goOnTime || robber.movesSoFar == 1 || robber.myPath.Count <= robber.movesSoFar))
             {
@@ -465,26 +548,26 @@ namespace wpfXbap
             for (int randNumber = 0; randNumber < r; randNumber++)
             {
                 node = board.random.Next(board.neighbor.Count);
-                    if (cop.ocupiedNode != node)
-                    {
-                        path = Dijkstra(node, node, cop.ocupiedNode, board);
-                        currentPathToCops.Add(path);
+                if (cop.ocupiedNode != node)
+                {
+                    path = Dijkstra(node, node, cop.ocupiedNode, board);
+                    currentPathToCops.Add(path);
 
-                    }
-                    foreach (List<int> tmp in currentPathToCops)
+                }
+                foreach (List<int> tmp in currentPathToCops)
+                {
+                    if (pathLength == 0 || pathLength > tmp.Count)
                     {
-                        if (pathLength == 0 || pathLength > tmp.Count)
-                        {
-                            pathLength = tmp.Count;
-                            path = tmp;
-                        }
+                        pathLength = tmp.Count;
+                        path = tmp;
                     }
-                    if (path.Count > bestPath.Count || bestPath.Count == 0)
-                    {
-                        bestPath = path;
-                        bestNode = node;
-                    }
-                    currentPathToCops.Clear();
+                }
+                if (path.Count > bestPath.Count || bestPath.Count == 0)
+                {
+                    bestPath = path;
+                    bestNode = node;
+                }
+                currentPathToCops.Clear();
             }
             return Dijkstra(robber.ocpupiedNode, robber.ocpupiedNode, bestNode, board);
         }
@@ -499,6 +582,7 @@ namespace wpfXbap
             int goNode = node;
             if (depth == 0 || node == oponentNode) //lub koniec gry
             {
+                iterAlfaBeta++;
                 return getNodeValue(node, oponentNode, player);
             }
 
@@ -573,6 +657,8 @@ namespace wpfXbap
                         break;
                     }
                 }
+                if (depth == startDepth)
+                    return goNode;
                 return beta;
             }
         }
@@ -585,15 +671,15 @@ namespace wpfXbap
             List<int> length = new List<int>();
             if (player)
             {
-                if (node == oponentNode) return 999;
-                length = Dijkstra(node, node, oponentNode);
-                return length.Count;
-            }
-            else
-            {
                 if (node == oponentNode) return -999;
                 length = Dijkstra(node, node, oponentNode);
                 return -(length.Count);
+            }
+            else
+            {
+                if (node == oponentNode) return 999;
+                length = Dijkstra(node, node, oponentNode);
+                return length.Count;
 
             }
         }
@@ -614,6 +700,122 @@ namespace wpfXbap
 
             }
         }
+
+        private Node<Data> simulateGame(int searchWidth, int searchDepth, int copnumber, Node<Data> node)
+        {
+            if (searchDepth != 0)
+            {
+                Data nodeInfo = node.GetData();
+                List<int> neighborList = new List<int>(board.findNeighbors(nodeInfo.RobberPos));
+                List<int> path = new List<int>();
+                int robberNodePosition;
+                for (int i = 0; i < searchWidth; i++)
+                {
+                    node.AddChild(FindChildOnBoard(neighborList, nodeInfo, copnumber, out robberNodePosition, board));
+                    if (neighborList.Contains(robberNodePosition))
+                        neighborList.Remove(robberNodePosition);
+                }
+                //obliczanie prawdopodobieństw do ruchu na zaraz
+                int sum = 0, iter = 0, maxNode = 0;
+                double maxProbNode = 0;
+                foreach (Node<Data> child in node.GetChildren())
+                {
+                    sum += child.GetData().RobberCopDistance;
+                }
+                foreach (Node<Data> child in node.GetChildren())
+                {
+                    iterMCTS++;
+                    child.GetData().Probability = (double)child.GetData().RobberCopDistance / sum;
+                    if (child.GetData().Probability > maxProbNode)
+                    {
+                        maxProbNode = child.GetData().Probability;
+                        maxNode = iter;
+                    }
+                    iter++;
+                }
+                simulateGame(searchWidth, searchDepth - 1, copnumber, node.GetChild(maxNode), board);
+            }
+
+            return node;
+        }
+
+        internal static Node<Data> simulateGame(int searchWidth, int searchDepth, int copnumber, Node<Data> node, Board board)
+        {
+            if (searchDepth != 0)
+            {
+                Data nodeInfo = node.GetData();
+                List<int> neighborList = new List<int>(board.findNeighbors(nodeInfo.RobberPos));
+                List<int> path = new List<int>();
+                int robberNodePosition;
+                for (int i = 0; i < searchWidth; i++)
+                {
+                    node.AddChild(FindChildOnBoard(neighborList, nodeInfo, copnumber, out robberNodePosition, board));
+                    if (neighborList.Contains(robberNodePosition))
+                        neighborList.Remove(robberNodePosition);
+                }
+                //obliczanie prawdopodobieństw do ruchu na zaraz
+                int sum = 0, iter = 0, maxNode = 0;
+                double maxProbNode = 0;
+                foreach (Node<Data> child in node.GetChildren())
+                {
+                    sum += child.GetData().RobberCopDistance;
+                }
+                foreach (Node<Data> child in node.GetChildren())
+                {
+                    child.GetData().Probability = (double)child.GetData().RobberCopDistance / sum;
+                    if (child.GetData().Probability > maxProbNode)
+                    {
+                        maxProbNode = child.GetData().Probability;
+                        maxNode = iter;
+                    }
+                    iter++;
+                }
+                simulateGame(searchWidth, searchDepth - 1, copnumber, node.GetChild(maxNode), board);
+            }
+
+            return node;
+        }
+
+        private Data FindChildOnBoard(List<int> neighborList, Data nodeInfo, int copnumber, out int robberNodePosition)
+        {
+            List<int> path = new List<int>();
+            Data newNode = new Data();
+            if (neighborList.Count != 0)
+            {
+                newNode.RobberPos = neighborList[board.random.Next(neighborList.Count)];    //neighbors of robber
+            }
+            for (int j = 0; j < copnumber; j++)
+            {
+                path = Dijkstra(nodeInfo.CopPos[j], nodeInfo.CopPos[j], newNode.RobberPos);     //path from cop to robber in the same variable
+                if (neighborList.Count > 0)
+                {
+                    newNode.CopPos[j] = path[1];
+                    if (newNode.RobberCopDistance > path.Count - 1 || newNode.RobberCopDistance == -1) newNode.RobberCopDistance = path.Count - 1;
+                }
+            }
+            robberNodePosition = newNode.RobberPos;
+            return newNode;
+        }
+        internal static Data FindChildOnBoard(List<int> neighborList, Data nodeInfo, int copnumber, out int robberNodePosition, Board board)
+        {
+            List<int> path = new List<int>();
+            Data newNode = new Data();
+            if (neighborList.Count != 0)
+            {
+                newNode.RobberPos = neighborList[board.random.Next(neighborList.Count)];    //neighbors of robber
+            }
+            for (int j = 0; j < copnumber; j++)
+            {
+                path = Dijkstra(nodeInfo.CopPos[j], nodeInfo.CopPos[j], newNode.RobberPos, board);     //path from cop to robber in the same variable
+                if (neighborList.Count > 0)
+                {
+                    newNode.CopPos[j] = path[1];
+                    if (newNode.RobberCopDistance > path.Count - 1 || newNode.RobberCopDistance == -1) newNode.RobberCopDistance = path.Count - 1;
+                }
+            }
+            robberNodePosition = newNode.RobberPos;
+            return newNode;
+        }
         #endregion
 
         /// <summary>
@@ -622,7 +824,7 @@ namespace wpfXbap
         /// <param name="copNumber">number of cops currently chaising robber</param>
         public bool isCought(int copNumber)
         {
-            for (int i = 0; i < copNumber; i++ )
+            for (int i = 0; i < copNumber; i++)
             {
                 if (cops[i].ocupiedNode == robber.ocpupiedNode)
                     return true;
@@ -650,8 +852,8 @@ namespace wpfXbap
             int nodenumber = board.neighbor.Count;
             int i;
             for (i = 0; i < copnumber; i++)
-			{
-			    cops.Add(new Cop(board.random.Next(nodenumber), board));
+            {
+                cops.Add(new Cop(board.random.Next(nodenumber), board));
                 cops[i].copId = i;
                 if (!ocupied.Contains(cops[i].ocupiedNode))
                 {
@@ -667,7 +869,7 @@ namespace wpfXbap
                     } while (ocupied.Contains(cops[i].startNode));
                     ocupied.Add(cops[i].startNode);
                 }
-			}
+            }
             foreach (Cop cop in cops)
             {
                 foreach (int a in cop.myNeighbors)
@@ -691,7 +893,9 @@ namespace wpfXbap
         {
             for (int i = 0; i < testNumber; i++)
             {
+                currentTest = i;
                 newDataForTest(txbIloscGoniacychMax);
+                checkClassOfGraph();
                 #region ROZNE ALGORYTMY
                 if (isGreedy)
                 {
@@ -702,8 +906,8 @@ namespace wpfXbap
                     }
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
-                            greedy_dijkstra_1vs_many(tmp);
-                            resetCops();
+                        greedy_dijkstra_1vs_many(tmp);
+                        resetCops();
                     }
                 }
                 if (isRandomB)
@@ -713,18 +917,43 @@ namespace wpfXbap
                         randomBeacon(txbBeaconRandom, txbGoOnTime, tmp);
                         resetCops();
                     }
-                    
+
                 }
                 if (isAlphaBeta)
                 {
                     for (int tmp = txbAlfaBetaDepthMin; tmp <= txbAlfaBetaDepthMax; tmp++)
                     {
-                        alphaBetavsGreedy(tmp, 1); 
+                        alphaBetavsGreedy(tmp, 1);
+                        resetCops();
+                    }
+                }
+                if (isMCTS)
+                {
+                    for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
+                    {
+                        MCTS(txbTreeWidth, txbTreeDepth, tmp);
                         resetCops();
                     }
                 }
                 #endregion
             }
+        }
+
+        private void checkClassOfGraph()
+        {
+            Board.removePitfalls(board);
+            foreach (List<int> tmp in board.neighborForClass)
+            {
+                if (tmp.Count != 0)
+                {
+                    board.isCopWinGraph = false;
+                }
+            }
+
+            if (board.isCopWinGraph)
+                classOfGraph = "Cop-Win";
+            else
+                classOfGraph = "Robber-Win";
         }
         /// <summary>
         /// reset players and cops to start positions for new test
@@ -737,7 +966,7 @@ namespace wpfXbap
                 ocupied[cop.copId] = cop.startNode;
                 cop.myNeighbors = board.findNeighbors(cop.startNode);
             }
-            robber.ocpupiedNode = robber.startNode;            
+            robber.ocpupiedNode = robber.startNode;
             robber.myNeighbors = board.findNeighbors(robber.startNode);
         }
         /// <summary>
@@ -760,7 +989,92 @@ namespace wpfXbap
             path = q.Reverse().ToList<int>();
 
         }
- 
+        internal static Node<Data> PropagateChildrenProbability(Node<Data> nodeTMP)
+        {
+            while (true)
+            {
+                if (nodeTMP.areAllChildrenLeaf() || nodeTMP.GetData().Visited == 1)
+                {
+                    nodeTMP.GetData().Visited = 1;
+                    break;
+                }
+                foreach (Node<Data> child in nodeTMP.GetChildren())
+                {
+                    if (child.IsLeaf())
+                    {
+                        if (child.GetData().Probability > child.GetParent().GetData().Probability)
+                        {
+                            child.GetParent().GetData().Probability = child.GetData().Probability;
+                        }
+                        child.GetData().Visited = 1;
+                    }
+                    else
+                    {
+                        PropagateChildrenProbability(child);
+                        child.GetData().Visited = 1;
+                    }
+                }
+            }
+            return nodeTMP;
+        }
+
+        internal static int robber_moves_MCTS(Tree<Node<Data>> MCTSTree, int robberNode, int copNode, int graphWidth, int graphDepth, Board board, out Tree<Node<Data>> MCTSTreeOut)
+        {
+            if (MCTSTree == null || MCTSTree.node.GetData().Counter == 0)
+            {
+                Data data = new Data();
+                data.CopPos[0] = copNode;
+                data.RobberPos = robberNode;
+                data.Counter = graphDepth;
+                MCTSTree = new Tree<Node<Data>>(simulateGame(graphWidth, graphDepth, 1, new Node<Data>(null, data), board));
+                MCTSTree.node = PropagateChildrenProbability(MCTSTree.node);
+                return getBestTreeNode(MCTSTree, out MCTSTreeOut, board);
+            }
+            else
+            {
+                return getBestTreeNode(MCTSTree, out MCTSTreeOut, board);
+            }
+        }
+
+        private int getBestTreeNode(Tree<Node<Data>> Tree, out Tree<Node<Data>> newTree)
+        {
+            LinkedList<Node<Data>> linkedList = new LinkedList<Node<Data>>(Tree.node.GetChildren());
+            int node = 0, iter = 0, nodeToMove = 0;
+            double maxProbability = 0;
+            foreach (Node<Data> treeNode in linkedList)
+            {
+                Data data = treeNode.GetData();
+                if (data.Probability > maxProbability)
+                {
+                    nodeToMove = data.RobberPos;
+                    node = iter;
+                    maxProbability = data.Probability;
+                }
+                iter++;
+            }
+            newTree = new Tree<Node<Data>>(Tree.node.GetChild(node));
+            return nodeToMove;
+        }
+        internal static int getBestTreeNode(Tree<Node<Data>> Tree, out Tree<Node<Data>> newTree, Board board)
+        {
+            LinkedList<Node<Data>> linkedList = new LinkedList<Node<Data>>(Tree.node.GetChildren());
+            int node = 0, iter = 0, nodeToMove = 0;
+            double maxProbability = 0;
+            foreach (Node<Data> treeNode in linkedList)
+            {
+                Data data = treeNode.GetData();
+                if (data.Probability > maxProbability)
+                {
+                    nodeToMove = data.RobberPos;
+                    node = iter;
+                    maxProbability = data.Probability;
+                }
+                iter++;
+            }
+            newTree = new Tree<Node<Data>>(Tree.node.GetChild(node));
+            return nodeToMove;
+        }
+
 
         /// <summary>
         /// find a shortest path from one of neighbors 'startnode' to 'finalnode', the root is 'from'
@@ -880,18 +1194,23 @@ namespace wpfXbap
             isGreedy = Convert.ToBoolean(Application.Current.Properties["tChbGreedy"]);
             isRandomB = Convert.ToBoolean(Application.Current.Properties["tChbBeacon"]);
             isAlphaBeta = Convert.ToBoolean(Application.Current.Properties["tChbAlfaBeta"]);
+            isMCTS = Convert.ToBoolean(Application.Current.Properties["tChbMCTS"]);
             txbIloscGoniacych = Convert.ToInt32(Application.Current.Properties["tTbCopNr"]);
             txbIloscGoniacychMax = Convert.ToInt32(Application.Current.Properties["tTbCopNrMax"]);
             txbBeaconRandom = Convert.ToInt32(Application.Current.Properties["tTbRandNr"]);
             txbGoOnTime = Convert.ToInt32(Application.Current.Properties["tTbgoOnTime"]);
             txbAlfaBetaDepthMin = Convert.ToInt32(Application.Current.Properties["tTbAlfaDepthMin"]);
             txbAlfaBetaDepthMax = Convert.ToInt32(Application.Current.Properties["tTbAlfaDepthMax"]);
+            txbTreeDepth = Convert.ToInt32(Application.Current.Properties["tTreeDepth"]);
+            txbTreeWidth = Convert.ToInt32(Application.Current.Properties["tTreeWidth"]);
 
             if (nodenumberMin > nodenumberMax) nodenumberMax = nodenumberMin;
             if (txbIloscGoniacych > txbIloscGoniacychMax) txbIloscGoniacychMax = txbIloscGoniacych;
             if (txbAlfaBetaDepthMin > txbAlfaBetaDepthMax) txbAlfaBetaDepthMax = txbAlfaBetaDepthMin;
         }
         #endregion
+
+
     }
     #region KLASA DO OBSŁUGI DATAGRID
     /// <summary>
@@ -899,6 +1218,8 @@ namespace wpfXbap
     /// </summary>
     public class outputClass
     {
+        private int m_testNumber;
+        private string m_graphClass;
         private string m_Winner;
         private string m_algorithm;
         private int m_copNumber;
@@ -906,7 +1227,15 @@ namespace wpfXbap
         private int m_verticies;
         private int m_moves;
         private int m_maxMoves;
-
+        private int m_iterations;
+        public int TestNumber
+        {
+            get { return m_testNumber; }
+        }
+        public string GraphClass
+        {
+            get { return m_graphClass; }
+        }
         public string Winner
         {
             get { return m_Winner; }
@@ -935,10 +1264,15 @@ namespace wpfXbap
         {
             get { return m_maxMoves; }
         }
-
-
-        public outputClass( string Winner, string Algorithm,int copNumber, int Nodes, int Vericies, int Moves, int MaxMoves )
+        public int Iterations
         {
+            get { return m_iterations; }
+        }
+
+        public outputClass(int TestNumber, string GraphClass, string Winner, string Algorithm, int copNumber, int Nodes, int Vericies, int Moves, int MaxMoves, int Iterations)
+        {
+            this.m_testNumber = TestNumber;
+            this.m_graphClass = GraphClass;
             this.m_Winner = Winner;
             this.m_algorithm = Algorithm;
             this.m_nodes = Nodes;
@@ -946,8 +1280,8 @@ namespace wpfXbap
             this.m_moves = Moves;
             this.m_maxMoves = MaxMoves;
             this.m_copNumber = copNumber;
+            this.m_iterations = Iterations;
         }
     }
     #endregion
 }
-    

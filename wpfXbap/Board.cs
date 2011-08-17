@@ -51,10 +51,12 @@ namespace wpfXbap
         private int count;
         private string type;
         public List<List<int>> neighbor;
+        public List<List<int>> neighborForClass;
         public List<Node> vertex;
         public List<int> vertexTest;
         public double distance;
         public int verticies;
+        public bool isCopWinGraph;
         public Random random = new Random(Convert.ToInt32(DateTime.Now.Ticks % 0x7FFFFFFF));
         #endregion
         /// <summary>
@@ -66,9 +68,16 @@ namespace wpfXbap
             distance = height*2+10;
             this.type = type;
             generateUserGraph(vertical, horizontal, getStartPositionX(vertical, boardWidth), getStarPositionY(horizontal, boardHeight));
+            neighborForClass = new List<List<int>>();
+            foreach (List<int> tmp in neighbor)
+            {
+                neighborForClass.Add(new List<int>(tmp));
+            }
+            isCopWinGraph = true;
+
             count = vertical + horizontal;
-            
         }
+        
         /// <summary>
         /// constructor for test
         /// get random values of nodes between 'nodeNumberMin' and nodeNumberMax'
@@ -81,11 +90,21 @@ namespace wpfXbap
             {
                 generateTestGraph(nodeNumber, out verticies, maxNodeSt);
             } while (!isCompact(neighbor, nodeNumber));
+            neighborForClass = new List<List<int>>();
+            foreach (List<int> tmp in neighbor)
+            {
+                neighborForClass.Add(new List<int>(tmp));
+            }
+            isCopWinGraph = true;
         }
 
 
         #region MAIN FUNCTIONS
-
+        /// <summary>
+        /// create a point on graph with user game
+        /// </summary>
+        /// <param name="x and y"> positions of point</param>
+        /// <param name="i">point number in list</param>
         public Node point(double x, double y, int i)
         {
             Ellipse myEllipse = new Ellipse();
@@ -170,8 +189,8 @@ namespace wpfXbap
             myLine.VerticalAlignment = VerticalAlignment.Center;
             myLine.StrokeThickness = 2;
             return myLine;
-            
         }
+
 
         #endregion
 
@@ -343,10 +362,19 @@ namespace wpfXbap
         #endregion
 
         #region FUNCTIONS
+        /// <summary>
+        /// return neighborhood of point
+        /// </summary>
         public List<int> findNeighbors(int number)
         {
             List<int> list = new List<int>();
             list = neighbor[number];
+            return list;
+        }
+        public List<int> findNeighbors(int number, bool forTest)
+        {
+            List<int> list = new List<int>();
+            list = neighborForClass[number];
             return list;
         }
         /// <summary>
@@ -380,6 +408,52 @@ namespace wpfXbap
                 return false;
             }
             return true;
+        }
+        public static List<List<int>> removePitfalls(Board board)
+        {
+            int numberOfNodes = board.neighborForClass.Count();
+            bool isEqual=true;
+            for (int i = 0; i < numberOfNodes; i++)
+            {
+                List<int> nodeList = board.neighborForClass[i];
+                if (nodeList.Count != 0)
+                    for (int j = 0; j < nodeList.Count; j++)
+                    {
+                        isEqual = true;
+                        int node = nodeList[j];
+                        List<int> robPos = new List<int>(nodeList);
+                        List<int> copPos = new List<int>(board.findNeighbors(node, true));
+                        copPos.Add(node);
+                        robPos.Add(i);
+                        copPos.Sort();
+                        robPos.Sort();
+
+                        for (int k = 0; k < robPos.Count; k++)
+                        {
+                            if (!copPos.Contains(robPos[k]))
+                            {
+                                isEqual = false;
+                                break;
+                            }
+                        }
+                        if (isEqual)
+                        {
+                            // nodeList.Remove(i);
+                            foreach (List<int> tmp in board.neighborForClass)
+                            {
+                                if (tmp.Contains(i))
+                                    tmp.Remove(i);
+                            }
+                            nodeList.Clear();
+                            board.neighborForClass = removePitfalls(board);
+                            nodeList = board.neighborForClass[0];
+                            i = 0; j = 0;
+                            break;
+                        }
+
+                    }
+            }
+            return board.neighborForClass;
         }
        
         #endregion

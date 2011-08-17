@@ -17,6 +17,8 @@
         <Label Content="Tura" Height="28" HorizontalAlignment="Left" Margin="34,24,0,0" Name="label4" VerticalAlignment="Top" Width="45" />
         <TextBlock Height="23" HorizontalAlignment="Left" Margin="94,29,0,0" Name="lblTura" Text="TextBlock" VerticalAlignment="Top" />
         <Button Content="Powrót" Height="23" HorizontalAlignment="Left" Margin="786,703,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
-    </Grid>
+            <Label Content="Klasa" Height="28" HorizontalAlignment="Left" Margin="167,24,0,0" Name="label5" VerticalAlignment="Top" Width="45" />
+            <TextBlock Height="23" HorizontalAlignment="Left" Margin="227,29,0,0" Name="lblKlasa" Text="TextBlock" VerticalAlignment="Top" />
+        </Grid>
     </ScrollViewer>
 </Page>

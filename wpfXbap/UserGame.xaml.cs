@@ -24,6 +24,7 @@ namespace wpfXbap
         Board board;
         Robber robber;
         Cop cop;
+        Tree<Node<Data>> MCTSTree = null;
         int clickedElement, nodenumber;
         bool copTurn, robberPlaced, copPlaced;
         int gWidth, gHeight;
@@ -54,7 +55,17 @@ namespace wpfXbap
             gAlgorithm = Convert.ToString(Application.Current.Properties["gAlgorithm"]);
             nodenumber = gHeight * gWidth;
             board = new Board(gWidth, gHeight, gType, (int)checkboard.Width, (int)checkboard.Height);
-
+            Board.removePitfalls(board);            
+            foreach (List<int> tmp in board.neighborForClass)
+            {
+                if (tmp.Count != 0)
+                {
+                    board.isCopWinGraph = false;
+                }
+            }
+            if (board.isCopWinGraph)
+                lblKlasa.Text = "Cop-Win";
+            else lblKlasa.Text = "Robber-Win";
 
             foreach (Node node in board.vertex)
             {
@@ -239,10 +250,15 @@ namespace wpfXbap
              if(gAlgorithm.Equals("zachłanny")){
                  nodetoGo = Tests.robber_moves_greedy_dumb(cop, robber);
              } else if(gAlgorithm.Equals("alfa-beta")){
-                nodetoGo = Tests.alphabeta(robber.ocpupiedNode, 3, -999, 999, true, cop.ocupiedNode, 4, board);
+                nodetoGo = Tests.alphabeta(robber.ocpupiedNode, 5, -999, 999, true, cop.ocupiedNode, 5, board);
              } else if(gAlgorithm.Equals("latarnie morskie")){
                  nodetoGo = Tests.robber_moves_randomBeacon(board, 10, 5, robber, cop);
-             } else {       //zachłanny z Dijkstrą
+             }
+             else if (gAlgorithm.Equals("MCTS")) 
+             {
+                 nodetoGo = Tests.robber_moves_MCTS(MCTSTree, robber.ocpupiedNode, cop.ocupiedNode, 4, 3, board, out MCTSTree); //szerokośc drzewa 4 wysokość 3
+             }
+             else {       //zachłanny z Dijkstrą
                  nodetoGo = Tests.robber_moves_greedy_dijkstra(1, board, cop, robber);
              }
 
