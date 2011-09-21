@@ -21,8 +21,8 @@
         </Grid>
         <Grid Height="473" HorizontalAlignment="Left" Margin="397,80,0,0" Name="grid2" VerticalAlignment="Top" Width="583" Background="#FF65CB65">
                 <CheckBox Content="MCTS" Height="29" Name="chbMCTS" Width="120" Margin="38,299,424,145" />
-            <Border BorderBrush="Silver" BorderThickness="1" Height="62" HorizontalAlignment="Left" Margin="26,355,0,0" Name="border2" VerticalAlignment="Top" Width="544" />
-            <TextBox x:Name="txbAlfaBetaDepthMin" Width="72" Height="25" TextWrapping="Wrap" Margin="339,375,172,73" Text="1" />
+            <Border BorderBrush="Silver" BorderThickness="1" Height="62" HorizontalAlignment="Left" Margin="25,344,0,0" Name="border2" VerticalAlignment="Top" Width="544" />
+            <TextBox x:Name="txbAlfaBetaDepthMin" Width="72" Height="25" TextWrapping="Wrap" Margin="339,359,172,89" Text="1" />
             <Label Content="Test section" Height="34" HorizontalAlignment="Left" Margin="227,6,0,0" Name="label2" VerticalAlignment="Top" Width="138" FontSize="16" FontWeight="Bold" d:LayoutOverrides="HorizontalAlignment" />
             <Label Content="Ilość wierzchołków" Height="26" HorizontalAlignment="Left" Margin="25,67,0,0" Name="label3" VerticalAlignment="Top" Width="125" />
             <TextBox Height="32" HorizontalAlignment="Left" Margin="178,61,0,0" Name="txbNodeNumberMin" VerticalAlignment="Top" Width="91" Text="50" LostFocus="txbNodeNumberMin_LostFocus" d:LayoutOverrides="HorizontalAlignment" />
@@ -30,26 +30,27 @@
             <TextBox Height="29" HorizontalAlignment="Left" Margin="178,109,0,0" Name="txbMaxNodeSt" VerticalAlignment="Top" Width="91" LostFocus="txbMaxNodeSt_LostFocus" d:LayoutOverrides="HorizontalAlignment, VerticalAlignment" Text="6" />
             <Label Content="Ilość testów na graf" Height="29" Margin="278,110,182,0" Name="label7" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" />
             <TextBox Height="29" HorizontalAlignment="Left" Margin="401,110,0,0" Name="txbTestNumber" VerticalAlignment="Top" Width="91" LostFocus="txbTestNumber_LostFocus" d:LayoutOverrides="VerticalAlignment" Text="5" />
-            <Button Content="Start testing" Height="23" Margin="227.097,423,280.903,0" Name="btnStartTests" VerticalAlignment="Top" Click="btnStartTests_Click" />
+            <Button Content="Start testing" Height="23" Margin="227,415,281,0" Name="btnStartTests" VerticalAlignment="Top" Click="btnStartTests_Click" />
             <Label Content="od" Height="28" HorizontalAlignment="Left" Margin="150,67,0,0" Name="label8" VerticalAlignment="Top" />
             <Label Content="do" Height="28" HorizontalAlignment="Left" Margin="325.903,65,0,0" Name="label9" VerticalAlignment="Top" RenderTransformOrigin="1.577,0.571" />
             <Label Content="max stopien wierz." Height="28" HorizontalAlignment="Left" Margin="25,110,0,0" Name="label10" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" />
             <CheckBox x:Name="chbGreedy" HorizontalAlignment="Left" Margin="38,204,0,0" Width="120" Content="greedy" VerticalAlignment="Top" Height="29"/>
             <CheckBox x:Name="chbBeacon" HorizontalAlignment="Left" Margin="38,0,0,195" Width="120" Content="random beacon" VerticalAlignment="Bottom" Height="29"/>
-            <CheckBox HorizontalAlignment="Left" Margin="38,0,0,67" Width="120" Content="alfa beta" VerticalAlignment="Bottom" Height="29" Name="chbAlfaBeta" />
+            <CheckBox HorizontalAlignment="Left" Margin="38,0,0,83" Width="120" Content="alfa beta" VerticalAlignment="Bottom" Height="29" Name="chbAlfaBeta" />
             <Label Margin="165,199,0,0" VerticalAlignment="Top" Height="29" Content="Ilość policjantów od/do" HorizontalAlignment="Left" Width="164"/>
             <TextBox x:Name="txbIloscGoniacych" Margin="339,200,0,0" VerticalAlignment="Top" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" Width="72" Text="1" />
             <Label Margin="158,0,254,195" VerticalAlignment="Bottom" Height="34" Content="liczba losowych wierzchołków"/>
             <TextBox x:Name="txbBeaconRandom" HorizontalAlignment="Right" Margin="0,0,172,202" VerticalAlignment="Bottom" Width="72" Height="25" TextWrapping="Wrap" Text="10" />
-            <Label Margin="165,0,0,71" VerticalAlignment="Bottom" Height="29" Content="głębokość zanurzenia od/do" HorizontalAlignment="Left" Width="163" />
-            <TextBox Height="27" HorizontalAlignment="Left" Margin="491,373,0,0" Name="txbAlfaBetaDepthMax" VerticalAlignment="Top" Width="72" Text="3" />
+            <Label Margin="165,0,0,87" VerticalAlignment="Bottom" Height="29" Content="głębokość zanurzenia od/do" HorizontalAlignment="Left" Width="163" />
+            <TextBox Height="27" HorizontalAlignment="Left" Margin="491,357,0,0" Name="txbAlfaBetaDepthMax" VerticalAlignment="Top" Width="72" Text="3" />
             <TextBox Height="25" HorizontalAlignment="Left" Margin="491,199,0,0" Name="txbIloscGoniacychMax" TextWrapping="Wrap" VerticalAlignment="Top" Width="72" Text="3" />
             <Label Content="czas marszu" Height="28" HorizontalAlignment="Left" Margin="419,244,0,0" Name="label12" VerticalAlignment="Top" />
             <TextBox Height="27" HorizontalAlignment="Left" Margin="491,244,0,0" Name="txbCzasMarszu" VerticalAlignment="Top" Width="72" Text="4" />
             <Label Content="szerokość drzewa" Height="28" HorizontalAlignment="Left" Margin="178,294,0,0" Name="label14" VerticalAlignment="Top" />
             <Label Content="wysokość" Height="28" HorizontalAlignment="Left" Margin="419,294,0,0" Name="label15" VerticalAlignment="Top" />
-            <TextBox Height="25" HorizontalAlignment="Right" Margin="0,0,172,152" Name="txbTreeWidth" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="72" Text="2" />
-            <TextBox Height="27" HorizontalAlignment="Left" Margin="491,294,0,0" Name="txbTreeDepth" VerticalAlignment="Top" Width="72" Text="2" />
+            <TextBox Height="25" HorizontalAlignment="Right" Margin="0,0,172,152" Name="txbTreeWidth" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="72" Text="3" />
+            <TextBox Height="27" HorizontalAlignment="Left" Margin="491,294,0,0" Name="txbTreeDepth" VerticalAlignment="Top" Width="72" Text="4" />
+            <CheckBox Content="Automatyczne testy na różnych danych (długotrwałe)" Height="23" HorizontalAlignment="Left" Margin="135,444,0,0" Name="chbAutoTest" VerticalAlignment="Top" Width="395" />
         </Grid>
     </Grid>
 </Page>

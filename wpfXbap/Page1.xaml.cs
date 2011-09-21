@@ -199,6 +199,7 @@ namespace wpfXbap
             Application.Current.Properties.Add("tChbBeacon", chbBeacon.IsChecked);
             Application.Current.Properties.Add("tChbAlfaBeta", chbAlfaBeta.IsChecked);
             Application.Current.Properties.Add("tChbMCTS", chbMCTS.IsChecked);
+            Application.Current.Properties.Add("tAutoTest", chbAutoTest.IsChecked);
 
             
 

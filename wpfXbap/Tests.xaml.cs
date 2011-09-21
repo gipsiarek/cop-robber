@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using System.IO;
 
 
 namespace wpfXbap
@@ -33,7 +33,8 @@ namespace wpfXbap
         private static int nodenumberMin, nodenumberMax, nodeNumber, maxNodeSt;    //info z kontrolek
         private int txbIloscGoniacych, txbIloscGoniacychMax, txbBeaconRandom, txbAlfaBetaDepthMin, txbAlfaBetaDepthMax, txbGoOnTime;
         private int txbTreeWidth, txbTreeDepth;
-        private bool isGreedy, isRandomB, isAlphaBeta, isMCTS;
+        public int maxMoves;
+        private bool isGreedy, isRandomB, isAlphaBeta, isMCTS, isAutoTest;
         private Tree<Data> MCTSTree;
         public bool copMove;
         public static List<outputClass> outputGreedyDijkstra;
@@ -69,8 +70,14 @@ namespace wpfXbap
                 outputBeacon = new List<outputClass>();
                 outputAlfaBeta = new List<outputClass>();
                 outputMCTS = new List<outputClass>();
-
-                runRobberRun(testNumber);
+                if (isAutoTest)
+                {
+                    runRobberAutoRun();
+                }
+                else
+                {
+                    runRobberRun(testNumber);
+                }
             }
             GridOutputGreedy.ItemsSource = outputGreedyDijkstra;
             GridOutputBeacon.ItemsSource = outputBeacon;
@@ -99,6 +106,7 @@ namespace wpfXbap
             Application.Current.Properties.Remove("tTreeWidth");
             Application.Current.Properties.Remove("tChbMCTS");
             Application.Current.Properties.Remove("FromXYPlot");
+            Application.Current.Properties.Remove("tAutoTest");
             NavigationService.GetNavigationService(this).Navigate(new Uri("Page1.xaml", UriKind.RelativeOrAbsolute));
         }
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -115,12 +123,12 @@ namespace wpfXbap
         ///// <summary>
         ///// rober find a naighbor without a cop and go there
         ///// </summary>
-        private bool greedy_dumb_1vsMany(int copnumber)
+        private outputClass greedy_dumb_1vsMany(int copnumber)
         {
 
             copMove = true;
             int moves = 0;
-            int maxMoves = board.verticies * 4;
+            
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
             iterGreedyDumb = 0;
@@ -139,17 +147,17 @@ namespace wpfXbap
                 }
             }
             outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "greedy-dumb", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves, iterGreedyDumb);
-            outputGreedyDumb.Add(o);
-            return isCought(copnumber);
+            if(!isAutoTest)
+                outputGreedyDumb.Add(o);
+            return o;
         }
         /// <summary>
         /// 1 greedy robber vs 'copnumber' of greedy cops
         /// </summary>
-        private bool greedy_dijkstra_1vs_many(int copnumber)
+        private outputClass greedy_dijkstra_1vs_many(int copnumber)
         {
             copMove = true;
             int moves = 0;
-            int maxMoves = board.verticies * 4;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
             iterGreedyDijkstra = 0;
@@ -169,19 +177,21 @@ namespace wpfXbap
                 }
             }
             outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "greedy", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves, iterGreedyDijkstra);
-            outputGreedyDijkstra.Add(o);
-            return isCought(copnumber);
+            if (!isAutoTest)
+            {
+                outputGreedyDijkstra.Add(o);
+            }
+            return o;
         }
         /// <summary>
         /// Random beacon algorithm
         /// </summary>
         /// <param name="r">number of nodes to randomly choose</param>
         /// <param name="goOnTime">number of steps to follow one choosed path</param>        
-        private bool randomBeacon(int r, int goOnTime, int copnumber)
+        private outputClass randomBeacon(int r, int goOnTime, int copnumber)
         {
             copMove = true;
             int moves = 0;
-            int maxMoves = board.verticies * 4;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
             List<int> robberPath = new List<int>();
@@ -215,19 +225,22 @@ namespace wpfXbap
                 }
             }
             outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "Beacon", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves,iterRandomBeacon);
-            outputBeacon.Add(o);
-            return isCought(copnumber);
+            if (!isAutoTest)
+            {
+                outputBeacon.Add(o);    
+            }
+            
+            return o;
         }
         /// <summary>
         /// function of robber running away with alpha beta and cop chaising him with greedy algorithm
         /// </summary>
         /// <param name="searchDepth">depth of alpha beta</param>
-        private bool alphaBetavsGreedy(int searchDepth, int copnumber)
+        private outputClass alphaBetavsGreedy(int searchDepth, int copnumber)
         {
             Cop cop = cops[0];
             copMove = true;
             int moves = 0;
-            int maxMoves = board.verticies * 2;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
             iterAlfaBeta = 0; ;
@@ -248,17 +261,19 @@ namespace wpfXbap
                 }
             }
             outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "ABvsGreedy d=" + searchDepth.ToString(), copnumber, board.neighbor.Count, board.verticies, moves, maxMoves, iterAlfaBeta);
-            outputAlfaBeta.Add(o);
-            return isCought(copnumber);
+            if (!isAutoTest)
+            {
+                outputAlfaBeta.Add(o);
+            }
+            return o;
         }
         /// <summary>
         /// cop with greedy algorithm and monte carlo tree search with propagation for robber
         /// </summary>
-        private bool MCTS(int treeWidth, int searchDepth, int copnumber)
+        private outputClass MCTS(int treeWidth, int searchDepth, int copnumber)
         {
             copMove = true;
             int moves = 0;
-            int maxMoves = board.verticies * 4;
             List<int> currentPath = new List<int>();
             List<int> bestPath = new List<int>();
             Tree<Node<Data>> MCTSTree = null;
@@ -274,8 +289,12 @@ namespace wpfXbap
                 }
                 else
                 {
-                    if (MCTSTree == null || counter == 0)
-                    {
+  //                  if (MCTSTree == null || counter == 0)
+    //                {
+                        if(MCTSTree!=null)
+                            MCTSTree.Clear();
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
                         counter = txbTreeDepth - 1;
                         Data data = new Data();
                         for (int i = 0; i < copnumber; i++)
@@ -284,23 +303,26 @@ namespace wpfXbap
                         }
                         data.RobberPos = robber.ocpupiedNode;
                         MCTSTree = new Tree<Node<Data>>(simulateGame(treeWidth, searchDepth, copnumber, new Node<Data>(null, data)));
-                        MCTSTree.node = PropagateChildrenProbability(MCTSTree.node);
+  //                      MCTSTree.node = PropagateChildrenProbability(MCTSTree.node);
                         robber.move(getBestTreeNode(MCTSTree, out MCTSTree), board);
                         copMove = true;
-                    }
-                    else
-                    {
-                        iterMCTS++;
-                        robber.move(getBestTreeNode(MCTSTree, out MCTSTree), board);
-                        copMove = true;
-                        counter--;
-                    }
+                //    }
+                //    else
+                //    {
+                //        iterMCTS++;
+                //        robber.move(getBestTreeNode(MCTSTree, out MCTSTree), board);
+                //        copMove = true;
+                //        counter--;
+                //    }
                 }
             }
 
             outputClass o = new outputClass(currentTest, classOfGraph, whoseWin(isCought(copnumber)), "MCTS", copnumber, board.neighbor.Count, board.verticies, moves, maxMoves,iterMCTS);
-            outputMCTS.Add(o);
-            return isCought(copnumber);
+            if (!isAutoTest)
+            {
+                outputMCTS.Add(o);
+            }
+            return o;
         }
 
     
@@ -377,6 +399,7 @@ namespace wpfXbap
             }
             return -1;
         }
+        
         /// <summary>
         /// move robber with greedy algorith with dijkstra heuristic
         /// </summary>
@@ -476,6 +499,7 @@ namespace wpfXbap
             }
             return -1;
         }
+        
         /// <summary>
         /// randomly r nodes and check which of these are farest away from cop
         /// then returns the path from robber to that node
@@ -571,6 +595,7 @@ namespace wpfXbap
             }
             return Dijkstra(robber.ocpupiedNode, robber.ocpupiedNode, bestNode, board);
         }
+        
         /// <summary>
         /// alpha beta algorithm :)
         /// </summary>
@@ -662,6 +687,7 @@ namespace wpfXbap
                 return beta;
             }
         }
+        
         /// <summary>
         /// heuristic function to rank a node for alpha beta algoritm
         /// </summary>
@@ -711,7 +737,7 @@ namespace wpfXbap
                 int robberNodePosition;
                 for (int i = 0; i < searchWidth; i++)
                 {
-                    node.AddChild(FindChildOnBoard(neighborList, nodeInfo, copnumber, out robberNodePosition, board));
+                    node.AddChild(FindChildOnBoard(neighborList, nodeInfo, copnumber, out robberNodePosition));
                     if (neighborList.Contains(robberNodePosition))
                         neighborList.Remove(robberNodePosition);
                 }
@@ -733,7 +759,8 @@ namespace wpfXbap
                     }
                     iter++;
                 }
-                simulateGame(searchWidth, searchDepth - 1, copnumber, node.GetChild(maxNode), board);
+                foreach(Node<Data> child in node.GetChildren())
+                    simulateGame(searchWidth, searchDepth - 1, copnumber, child);
             }
 
             return node;
@@ -831,6 +858,7 @@ namespace wpfXbap
             }
             return false;
         }
+        
         /// <summary>
         /// returns a name of winner of the game
         /// </summary>
@@ -840,6 +868,7 @@ namespace wpfXbap
                 return "COP";
             else return "ROBBER";
         }
+        
         /// <summary>
         /// creating new board robber and cops for new series of runaways
         /// </summary>        
@@ -884,29 +913,81 @@ namespace wpfXbap
                 robber = new Robber(board.random.Next(nodenumber), board);
                 robber.startNode = robber.ocpupiedNode;
                 if (i > 100) newDataForTest(copnumber);
-            } while (ocupied.Contains(robber.ocpupiedNode) && notSafe.Contains(robber.ocpupiedNode));
+            } while (ocupied.Contains(robber.ocpupiedNode) || notSafe.Contains(robber.ocpupiedNode));
+        }
+        
+        private void newDataAutoTest(int copnumber, int nodenumberMin, int nodenumberMax, int maxNodeSt)
+        {
+            List<int> notSafe = new List<int>();
+            cops = new List<Cop>();
+            ocupied = new List<int>();
+            board = new Board(nodenumberMin, nodenumberMax, maxNodeSt);
+            int nodenumber = board.neighbor.Count;
+            int i;
+            for (i = 0; i < copnumber; i++)
+            {
+                cops.Add(new Cop(board.random.Next(nodenumber), board));
+                cops[i].copId = i;
+                if (!ocupied.Contains(cops[i].ocupiedNode))
+                {
+                    ocupied.Add(cops[i].ocupiedNode);
+                    cops[i].startNode = cops[i].ocupiedNode;
+                }
+                else
+                {
+                    do
+                    {
+                        cops[i] = new Cop(board.random.Next(nodenumber), board);
+                        cops[i].startNode = cops[i].ocupiedNode;
+                    } while (ocupied.Contains(cops[i].startNode));
+                    ocupied.Add(cops[i].startNode);
+                }
+            }
+            foreach (Cop cop in cops)
+            {
+                foreach (int a in cop.myNeighbors)
+                {
+                    notSafe.Add(a);
+                }
+            }
+            i = 0;
+            do
+            {
+                i++;
+                robber = new Robber(board.random.Next(nodenumber), board);
+                robber.startNode = robber.ocpupiedNode;
+                if (i > 100) newDataForTest(copnumber);
+            } while (ocupied.Contains(robber.ocpupiedNode) || notSafe.Contains(robber.ocpupiedNode));
         }
         /// <summary>
         /// main loop for invoking test
         /// </summary>
         private void runRobberRun(int testNumber)
         {
+            FileStream fs = new FileStream(@"d:\test.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            StreamWriter sw = new StreamWriter(fs);
+            sw.BaseStream.Seek(0, SeekOrigin.End); 
+            outputClass output = null;
             for (int i = 0; i < testNumber; i++)
             {
                 currentTest = i;
                 newDataForTest(txbIloscGoniacychMax);
                 checkClassOfGraph();
+                maxMoves = board.verticies * 10;
+
                 #region ROZNE ALGORYTMY
                 if (isGreedy)
                 {
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
-                        greedy_dumb_1vsMany(tmp);
+                        output = greedy_dumb_1vsMany(tmp);
+                        sw.WriteLine(output.ToString());
                         resetCops();
                     }
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
-                        greedy_dijkstra_1vs_many(tmp);
+                        output = greedy_dijkstra_1vs_many(tmp);
+                        sw.WriteLine(output.ToString());
                         resetCops();
                     }
                 }
@@ -914,7 +995,8 @@ namespace wpfXbap
                 {
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
-                        randomBeacon(txbBeaconRandom, txbGoOnTime, tmp);
+                        output = randomBeacon(txbBeaconRandom, txbGoOnTime, tmp);
+                        sw.WriteLine(output.ToString());
                         resetCops();
                     }
 
@@ -923,7 +1005,8 @@ namespace wpfXbap
                 {
                     for (int tmp = txbAlfaBetaDepthMin; tmp <= txbAlfaBetaDepthMax; tmp++)
                     {
-                        alphaBetavsGreedy(tmp, 1);
+                        output = alphaBetavsGreedy(tmp, 1);
+                        sw.WriteLine(output.ToString());
                         resetCops();
                     }
                 }
@@ -931,12 +1014,896 @@ namespace wpfXbap
                 {
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
-                        MCTS(txbTreeWidth, txbTreeDepth, tmp);
+                        output = MCTS(txbTreeWidth, txbTreeDepth, tmp);
+                        sw.WriteLine(output.ToString());
                         resetCops();
                     }
                 }
                 #endregion
             }
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+        }
+
+        /// <summary>
+        /// automatic test for all algorithm! Takes long time to finish
+        /// only for magisterka
+        /// </summary>
+        private void runRobberAutoRun()
+        {                    
+           
+            FileStream fs = new FileStream(@"d:\testAutoGreedyDijkstra2Cop.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            StreamWriter sw = new StreamWriter(fs);
+            sw.BaseStream.Seek(0, SeekOrigin.End);
+            #region greedy
+            if (isGreedy)
+            {
+                for (int i = 0; i != 10; i++)
+                {
+                    //graf mały 
+                    currentTest = i;
+                    newDataAutoTest(2, 50, 200, 20);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;                    
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 50 | 200 | 20");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 30);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 50 | 200 | 30");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 40);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 50 | 200 | 40");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 50);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 50 | 200 | 50");
+                    resetCops();
+                    sw.Flush();
+
+                    //graf średni
+                    newDataAutoTest(2, 200, 500, 50);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 200 | 500 | 50");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 75);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 200 | 500 | 75");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 100);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 200 | 500 | 100");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 150);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 200 | 500 | 150");
+                    resetCops();
+                    sw.Flush();
+
+                    //graf duzy
+                    newDataAutoTest(2, 500, 1000, 100);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 500 | 1000 | 100");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 150);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 500 | 1000 | 150");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 200);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 500 | 1000 | 200");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 300);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dijkstra_1vs_many(2).ToString() + " | 500 | 1000 | 300");
+                    resetCops();
+                    sw.Flush();
+                }
+                sw.Flush();
+                sw.Close();
+                fs.Close();
+                fs = new FileStream(@"d:\testAutoGreedyDumb2Cop.txt", FileMode.OpenOrCreate, FileAccess.Write);
+                sw = new StreamWriter(fs);
+                sw.BaseStream.Seek(0, SeekOrigin.End);
+                for (int i = 0; i != 10; i++)
+                {
+                    //graf mały 
+                    currentTest = i;
+                    newDataAutoTest(2, 50, 200, 20);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 50 | 200 | 20");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 30);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 50 | 200 | 30");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 40);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 50 | 200 | 40");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 50);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 50 | 200 | 50");
+                    resetCops();
+                    sw.Flush();
+
+                    //graf średni
+                    newDataAutoTest(2, 200, 500, 50);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 200 | 500 | 50");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 75);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 200 | 500 | 75");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 100);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 200 | 500 | 100");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 150);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 200 | 500 | 150");
+                    resetCops();
+                    sw.Flush();
+
+                    //graf duzy
+                    newDataAutoTest(2, 500, 1000, 100);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 500 | 1000 | 100");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 150);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 500 | 1000 | 100");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 200);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 500 | 1000 | 100");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 300);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(greedy_dumb_1vsMany(2).ToString() + " | 500 | 1000 | 100");
+                    resetCops();
+                    sw.Flush();
+                }
+                sw.Flush();
+                sw.Close();
+                fs.Close();
+            }
+            #endregion
+
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+            fs = new FileStream(@"d:\testAutoRandBeacon2Cop.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            sw = new StreamWriter(fs);
+            sw.BaseStream.Seek(0, SeekOrigin.End);
+
+            #region RandomBeacon
+            if (isRandomB)
+            {
+                for (int i = 0; i != 10; i++)
+                {
+                    //graf mały 
+                    currentTest = i;
+                    newDataAutoTest(2, 50, 200, 20);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(randomBeacon(10, 5, 2).ToString() + "| 10 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(10, 10, 2).ToString() + "| 10 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(10, 20, 2).ToString() + "| 10 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 5, 2).ToString() + "| 40 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 10, 2).ToString() + "| 40 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 20, 2).ToString() + "| 40 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+
+                    newDataAutoTest(2, 50, 200, 30);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(randomBeacon(10, 5, 2).ToString() + "| 10 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(10, 10, 2).ToString() + "| 10 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(10, 20, 2).ToString() + "| 10 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 5, 2).ToString() + "| 40 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 10, 2).ToString() + "| 40 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 20, 2).ToString() + "| 40 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 40);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(randomBeacon(10, 5, 2).ToString() + "| 10 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(10, 10, 2).ToString() + "| 10 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(10, 20, 2).ToString() + "| 10 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 5, 2).ToString() + "| 40 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 10, 2).ToString() + "| 40 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(40, 20, 2).ToString() + "| 40 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+                    //graf średni
+                    newDataAutoTest(2, 200, 500, 50);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(randomBeacon(50, 5, 2).ToString() + "| 50 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 10, 2).ToString() + "| 50 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 20, 2).ToString() + "| 50 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 5, 2).ToString() + "| 150 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 10, 2).ToString() + "| 150 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 20, 2).ToString() + "| 150 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 75);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(randomBeacon(50, 5, 2).ToString() + "| 50 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 10, 2).ToString() + "| 50 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 20, 2).ToString() + "| 50 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 5, 2).ToString() + "| 150 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 10, 2).ToString() + "| 150 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 20, 2).ToString() + "| 150 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 100);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(randomBeacon(10, 5, 2).ToString() + "| 10 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 5, 2).ToString() + "| 50 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 10, 2).ToString() + "| 50 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 20, 2).ToString() + "| 50 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 5, 2).ToString() + "| 150 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 10, 2).ToString() + "| 150 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 20, 2).ToString() + "| 150 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+                    //graf duzy
+                    newDataAutoTest(2, 500, 1000, 100);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(randomBeacon(10, 5, 2).ToString() + "| 10 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 5, 2).ToString() + "| 50 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 10, 2).ToString() + "| 50 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 20, 2).ToString() + "| 50 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 5, 2).ToString() + "| 150 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 10, 2).ToString() + "| 150 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 20, 2).ToString() + "| 150 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 150);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(randomBeacon(10, 5, 2).ToString() + "| 10 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 5, 2).ToString() + "| 50 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 10, 2).ToString() + "| 50 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 20, 2).ToString() + "| 50 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 5, 2).ToString() + "| 150 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 10, 2).ToString() + "| 150 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 20, 2).ToString() + "| 150 | 20 ");
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 200);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(randomBeacon(10, 5, 2).ToString() + "| 10 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 5, 2).ToString() + "| 50 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 10, 2).ToString() + "| 50 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(50, 20, 2).ToString() + "| 50 | 20 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 5, 2).ToString() + "| 150 | 5 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 10, 2).ToString() + "| 150 | 10 ");
+                    resetCops();
+                    sw.WriteLine(randomBeacon(150, 20, 2).ToString() + "| 150 | 20 ");
+                    resetCops();
+                    sw.Flush();
+                }
+            }
+#endregion
+
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+            fs = new FileStream(@"d:\testAutoMCTS2Cops.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            sw = new StreamWriter(fs);
+            sw.BaseStream.Seek(0, SeekOrigin.End);
+
+            #region MCTS
+            if (isMCTS)
+            {
+                for (int i = 0; i != 10; i++)
+                {
+                    //graf mały 
+                    currentTest = i;
+                    newDataAutoTest(2, 50, 200, 20);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+
+                    newDataAutoTest(2, 50, 200, 30);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 40);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    //graf średni
+                    newDataAutoTest(2, 200, 500, 50);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 75);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " +txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 3, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+
+                    newDataAutoTest(2, 200, 500, 100);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    //graf duzy
+                    newDataAutoTest(2, 500, 1000, 100);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 150);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 200);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    txbTreeWidth = 2; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(2, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 2; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(2, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 2;
+                    sw.WriteLine(MCTS(4, 2, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(4, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    txbTreeWidth = 6; txbTreeDepth = 4;
+                    sw.WriteLine(MCTS(6, 4, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    sw.Flush();
+                    resetCops();
+                    txbTreeWidth = 4; txbTreeDepth = 6;
+                    sw.WriteLine(MCTS(4, 6, 2).ToString() + " | " + txbTreeWidth.ToString() + " | " + txbTreeDepth.ToString());
+                    resetCops();
+                    sw.Flush();
+                }
+            }
+            #endregion
+
+            
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+            fs = new FileStream(@"d:\testAutoAlfaBet.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            sw = new StreamWriter(fs);
+            sw.BaseStream.Seek(0, SeekOrigin.End);
+
+            #region AlphaBEta
+            if (isAlphaBeta)
+            {
+                for (int i = 0; i != 10; i++)
+                {
+                    //graf mały 
+                    currentTest = i;
+                    newDataAutoTest(1, 50, 200, 20);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+
+                    newDataAutoTest(1, 50, 200, 30);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(1, 50, 200, 40);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    //graf średni
+                    newDataAutoTest(1, 200, 500, 50);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(1, 200, 500, 75);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(1, 200, 500, 100);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    //graf duzy
+                    newDataAutoTest(1, 500, 1000, 100);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(1, 500, 1000, 150);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(1, 500, 1000, 200);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(alphaBetavsGreedy(1, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 1).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 1).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                }
+            }
+            #endregion
+
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+
+
+            fs = new FileStream(@"d:\testAutoAlfaBet2Cops.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            sw = new StreamWriter(fs);
+            sw.BaseStream.Seek(0, SeekOrigin.End);
+
+            #region AlphaBEta
+            if (isAlphaBeta)
+            {
+                for (int i = 0; i != 10; i++)
+                {
+                    //graf mały 
+                    currentTest = i;
+                    newDataAutoTest(2, 50, 200, 20);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+
+                    newDataAutoTest(2, 50, 200, 30);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 50, 200, 40);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    //graf średni
+                    newDataAutoTest(2, 200, 500, 50);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 75);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 200, 500, 100);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 5;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    //graf duzy
+                    newDataAutoTest(2, 500, 1000, 100);        //zadki
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 150);        //sredni
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    maxMoves = board.verticies * 10;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                    newDataAutoTest(2, 500, 1000, 200);        //gesty
+                    checkClassOfGraph();
+                    maxMoves = board.verticies * 2;
+                    sw.WriteLine(alphaBetavsGreedy(1, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(2, 2).ToString());
+                    resetCops();
+                    sw.WriteLine(alphaBetavsGreedy(3, 2).ToString());
+                    resetCops();
+                    sw.Flush();
+
+                }
+            }
+            #endregion
+
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+            //randomBeacon(10, 5, 1);
+            //resetCops();
+            //alphaBetavsGreedy(3, 1);
+            //resetCops();
+            //MCTS(3, 4, 1);
+            //resetCops();
+
         }
 
         private void checkClassOfGraph()
@@ -955,6 +1922,7 @@ namespace wpfXbap
             else
                 classOfGraph = "Robber-Win";
         }
+        
         /// <summary>
         /// reset players and cops to start positions for new test
         /// </summary>
@@ -969,6 +1937,7 @@ namespace wpfXbap
             robber.ocpupiedNode = robber.startNode;
             robber.myNeighbors = board.findNeighbors(robber.startNode);
         }
+        
         /// <summary>
         /// Convert the path from dijkstra algorithm to fit natural version from start node to finish node
         /// </summary>
@@ -989,6 +1958,7 @@ namespace wpfXbap
             path = q.Reverse().ToList<int>();
 
         }
+      
         internal static Node<Data> PropagateChildrenProbability(Node<Data> nodeTMP)
         {
             while (true)
@@ -1074,7 +2044,6 @@ namespace wpfXbap
             newTree = new Tree<Node<Data>>(Tree.node.GetChild(node));
             return nodeToMove;
         }
-
 
         /// <summary>
         /// find a shortest path from one of neighbors 'startnode' to 'finalnode', the root is 'from'
@@ -1185,6 +2154,7 @@ namespace wpfXbap
             }
             return path;
         }
+
         private void getDataFromProperties()
         {
             testNumber = Convert.ToInt32(Application.Current.Properties["tTestNumber"]);
@@ -1203,6 +2173,7 @@ namespace wpfXbap
             txbAlfaBetaDepthMax = Convert.ToInt32(Application.Current.Properties["tTbAlfaDepthMax"]);
             txbTreeDepth = Convert.ToInt32(Application.Current.Properties["tTreeDepth"]);
             txbTreeWidth = Convert.ToInt32(Application.Current.Properties["tTreeWidth"]);
+            isAutoTest = Convert.ToBoolean(Application.Current.Properties["tAutoTest"]);
 
             if (nodenumberMin > nodenumberMax) nodenumberMax = nodenumberMin;
             if (txbIloscGoniacych > txbIloscGoniacychMax) txbIloscGoniacychMax = txbIloscGoniacych;
@@ -1281,6 +2252,22 @@ namespace wpfXbap
             this.m_maxMoves = MaxMoves;
             this.m_copNumber = copNumber;
             this.m_iterations = Iterations;
+        }
+
+        public override string ToString()
+        {
+            return string.Format(@"{0} | {1} | {2} | {3} | {4} | {5} | {6} | {7} | {8} | {9} ",
+                this.m_testNumber,
+                this.m_graphClass,
+                this.m_Winner,
+                this.m_algorithm,
+                this.m_nodes,
+                this.m_verticies,
+                this.m_moves,
+                this.m_maxMoves,
+                this.m_copNumber,
+                this.m_iterations
+                ); 
         }
     }
     #endregion

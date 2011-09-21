@@ -4,18 +4,26 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" Title="XYPlot" Height="852" Width="1265" xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit">
-    <ScrollViewer>
-        <Grid Height="846" Width="1246">
-            <chartingToolkit:Chart Canvas.Left="494" Canvas.Top="34" Name="chart1" Margin="55,81,611,334">
+    <ScrollViewer Height="987" Width="1267">
+        <Grid Height="1073" Width="1250">
+            <chartingToolkit:Chart Canvas.Left="494" Canvas.Top="34" Name="chart1" Margin="40,81,626,650" Title="Wykres" >
+                <chartingToolkit:Chart.Axes>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Liczba iteracji" />
+                    <chartingToolkit:LinearAxis Orientation="X" Title="Skuteczność [%]"/>
+                </chartingToolkit:Chart.Axes>
                 <chartingToolkit:Chart.Series>
-                    <chartingToolkit:ScatterSeries Title="Greedy" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}" ></chartingToolkit:ScatterSeries>
-                    <chartingToolkit:ScatterSeries Title="Greedy+Dijkstra" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"></chartingToolkit:ScatterSeries>
-                    <chartingToolkit:ScatterSeries Title="Random Beacon" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"></chartingToolkit:ScatterSeries>
-                    <chartingToolkit:ScatterSeries Title="Alfa Beta" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"></chartingToolkit:ScatterSeries>
-                    <chartingToolkit:ScatterSeries Title="MCTS" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"></chartingToolkit:ScatterSeries>
+                    <chartingToolkit:ScatterSeries Title="Greedy" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"/>
+                    <chartingToolkit:ScatterSeries Title="Greedy+Dijkstra" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"/>
+                    <chartingToolkit:ScatterSeries Title="Random Beacon" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"/>
+                    <chartingToolkit:ScatterSeries Title="Alfa Beta" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"/>
+                    <chartingToolkit:ScatterSeries Title="MCTS" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"/>
                 </chartingToolkit:Chart.Series>
             </chartingToolkit:Chart>
-            <chartingToolkit:Chart Canvas.Left="694" Canvas.Top="34" Name="chart2" Margin="641,81,25,334">
+            <chartingToolkit:Chart Canvas.Left="694" Canvas.Top="34" Name="chart2" Margin="641,81,25,650">
+                <chartingToolkit:Chart.Axes>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Liczba iteracji" />
+                    <chartingToolkit:LinearAxis Orientation="X" Title="Liczba ruchów"/>
+                </chartingToolkit:Chart.Axes>
                 <chartingToolkit:Chart.Series>
                     <chartingToolkit:ScatterSeries Title="Greedy" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}" ></chartingToolkit:ScatterSeries>
                     <chartingToolkit:ScatterSeries Title="Greedy+Dijkstra" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}"></chartingToolkit:ScatterSeries>
@@ -26,12 +34,12 @@
             </chartingToolkit:Chart>
             <Button Content="Powrót do wyników" Height="25" HorizontalAlignment="Left" Margin="505,6,0,0" Name="btnWyniki" VerticalAlignment="Top" Width="130" Click="btnWyniki_Click" />
             <Button Content="Powrót na start" Height="25" HorizontalAlignment="Left" Margin="641,6,0,0" Name="btnStart" VerticalAlignment="Top" Width="123" Click="btnStart_Click" />
-            <Label Content="Zachłanny + Dijkstra" Height="28" HorizontalAlignment="Left" Margin="124,37,0,0" Name="label1" VerticalAlignment="Top" Width="118" />
-            <Label Content="Zachłanny" Height="28" HorizontalAlignment="Left" Margin="333,37,0,0" Name="label2" VerticalAlignment="Top" Width="73" />
-            <Label Content="Random Beacon" Height="28" HorizontalAlignment="Left" Margin="505,37,0,0" Name="label3" VerticalAlignment="Top" Width="118" />
-            <Label Content="Alfa Beta" Height="28" HorizontalAlignment="Left" Margin="723,37,0,0" Name="label4" VerticalAlignment="Top" Width="66" />
-            <Label Content="MCTS" Height="28" HorizontalAlignment="Left" Margin="903,37,0,0" Name="label5" VerticalAlignment="Top" Width="65" />
-            
+            <chartingToolkit:Chart Canvas.Left="694" Canvas.Top="34" Margin="219,439,162,233" Name="chart3">
+                <chartingToolkit:Chart.Series>
+                    <chartingToolkit:BarSeries DependentValueBinding="{Binding Path=Value}" IndependentValueBinding="{Binding Path=Key}" Title="Cop" />
+                    <chartingToolkit:BarSeries DependentValueBinding="{Binding Path=Value}" IndependentValueBinding="{Binding Path=Key}" Title="Robber" />
+                </chartingToolkit:Chart.Series>
+            </chartingToolkit:Chart>
         </Grid>
     </ScrollViewer>
 </Page>

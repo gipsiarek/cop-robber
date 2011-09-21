@@ -37,28 +37,41 @@ namespace wpfXbap
             InitPlot();
         }
         public void InitPlot(){
+            int copWin = 0;
+            int robWin = 0;
             List<KeyValuePair<double, int>> greedySource = new List<KeyValuePair<double, int>>();
             List<KeyValuePair<int, int>> greedySource2 = new List<KeyValuePair<int, int>>();
+            List<KeyValuePair<string, int>> barGraphCop = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> barGraphRob = new List<KeyValuePair<string, int>>();
             if (Tests.outputGreedyDumb != null)
             {
+                
                 foreach (outputClass item in Tests.outputGreedyDumb)
                 {
                     greedySource.Add(new KeyValuePair<double, int>((double)(((double)item.Moves / (double)item.MaxMoves)) * 100, item.Iterations));
                     greedySource2.Add(new KeyValuePair<int, int>(item.Moves , item.Iterations));
+                    if(item.Winner.Equals("COP")) copWin++; else robWin++;
                 }
+
+                barGraphCop.Add(new KeyValuePair<string, int>("Greedy Dumb Cop", copWin));
+                barGraphRob.Add(new KeyValuePair<string, int>("Greedy Dumb Rob", robWin));
             }
             ((ScatterSeries)chart1.Series[0]).ItemsSource = greedySource;
             ((ScatterSeries)chart2.Series[0]).ItemsSource = greedySource2;
 
             List<KeyValuePair<double, int>> greedyDijkstraSource = new List<KeyValuePair<double, int>>();
             List<KeyValuePair<int, int>> greedyDijkstraSource2 = new List<KeyValuePair<int, int>>();
+            copWin = robWin = 0;
             if (Tests.outputGreedyDijkstra != null)
             {
                 foreach (outputClass item in Tests.outputGreedyDijkstra)
                 {
                     greedyDijkstraSource.Add(new KeyValuePair<double, int>((double)(((double)item.Moves / (double)item.MaxMoves)) * 100, item.Iterations));
                     greedyDijkstraSource2.Add(new KeyValuePair<int, int>(item.Moves, item.Iterations));
+                    if (item.Winner.Equals("COP")) copWin++; else robWin++;
                 }
+                barGraphCop.Add(new KeyValuePair<string, int>("Greedy Dijkstra Cop", copWin));
+                barGraphRob.Add(new KeyValuePair<string, int>("Greedy Dijkstra Rob", robWin));
             }
             ((ScatterSeries)chart1.Series[1]).ItemsSource = greedyDijkstraSource;
             ((ScatterSeries)chart2.Series[1]).ItemsSource = greedyDijkstraSource2;
@@ -67,28 +80,35 @@ namespace wpfXbap
             List<KeyValuePair<int, int>> beaconSource2 = new List<KeyValuePair<int, int>>();
             if (Tests.outputBeacon != null)
             {
+                copWin = robWin = 0;
                 foreach (outputClass item in Tests.outputBeacon)
                 {
                     beaconSource.Add(new KeyValuePair<double, int>((double)(((double)item.Moves / (double)item.MaxMoves)) * 100, item.Iterations));
                     beaconSource2.Add(new KeyValuePair<int, int>(item.Moves, item.Iterations));
+                    if (item.Winner.Equals("COP")) copWin++; else robWin++;
                 }
+                barGraphCop.Add(new KeyValuePair<string, int>("Beacon Cop", copWin));
+                barGraphRob.Add(new KeyValuePair<string, int>("Beacon Rob", robWin));
             }
             ((ScatterSeries)chart1.Series[2]).ItemsSource = beaconSource;
             ((ScatterSeries)chart2.Series[2]).ItemsSource = beaconSource2;
-
 
             List<KeyValuePair<double, int>> alfaBetaSource = new List<KeyValuePair<double, int>>();
             List<KeyValuePair<int, int>> alfaBetaSource2 = new List<KeyValuePair<int, int>>();
             if (Tests.outputAlfaBeta != null)
             {
+                copWin = robWin = 0;
                 foreach (outputClass item in Tests.outputAlfaBeta)
                 {
                     alfaBetaSource.Add(new KeyValuePair<double, int>((double)(((double)item.Moves / (double)item.MaxMoves)) * 100, item.Iterations));
                     alfaBetaSource2.Add(new KeyValuePair<int, int>(item.Moves, item.Iterations));
+                    if (item.Winner.Equals("COP")) copWin++; else robWin++;
                 }
+                barGraphCop.Add(new KeyValuePair<string, int>("Alfa Beta Cop", copWin));
+                barGraphRob.Add(new KeyValuePair<string, int>("Alfa Beta Rob", robWin));
             }
             ((ScatterSeries)chart1.Series[3]).ItemsSource = alfaBetaSource;
-            ((ScatterSeries)chart2.Series[2]).ItemsSource = alfaBetaSource2;
+            ((ScatterSeries)chart2.Series[3]).ItemsSource = alfaBetaSource2;
 
             List<KeyValuePair<double, int>> MCTSSource = new List<KeyValuePair<double, int>>();
             List<KeyValuePair<int, int>> MCTSSource2 = new List<KeyValuePair<int, int>>();
@@ -96,12 +116,18 @@ namespace wpfXbap
             {
                 foreach (outputClass item in Tests.outputBeacon)
                 {
+                    copWin = robWin = 0;
                     MCTSSource.Add(new KeyValuePair<double, int>((double)(((double)item.Moves / (double)item.MaxMoves)) * 100, item.Iterations));
                     MCTSSource2.Add(new KeyValuePair<int, int>(item.Moves, item.Iterations));
+                    if (item.Winner.Equals("COP")) copWin++; else robWin++;
                 }
+                barGraphCop.Add(new KeyValuePair<string, int>("MCTS Cop", copWin));
+                barGraphRob.Add(new KeyValuePair<string, int>("MCTS Rob", robWin));
             }
             ((ScatterSeries)chart1.Series[4]).ItemsSource = MCTSSource;
-            ((ScatterSeries)chart2.Series[2]).ItemsSource = MCTSSource2;
+            ((ScatterSeries)chart2.Series[4]).ItemsSource = MCTSSource2;
+            ((BarSeries)chart3.Series[0]).ItemsSource = barGraphCop;
+            ((BarSeries)chart3.Series[1]).ItemsSource = barGraphRob;
         }
 
         //private void DrawChart()
@@ -197,6 +223,7 @@ namespace wpfXbap
             Application.Current.Properties.Remove("tTreeWidth");
             Application.Current.Properties.Remove("tChbMCTS");
             Application.Current.Properties.Remove("FromXYPlot");
+            Application.Current.Properties.Remove("tAutoTest");
             NavigationService.GetNavigationService(this).Navigate(new Uri("Page1.xaml", UriKind.RelativeOrAbsolute));
         }
     }
