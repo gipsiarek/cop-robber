@@ -142,7 +142,9 @@ namespace wpfXbap
                 }
                 else
                 {
-                    robber.move(robber_moves_greedy_dumb(copnumber), board);
+                    int next = robber_moves_greedy_dumb(copnumber);
+                    if(next!=-1)
+                        robber.move(next, board);
                     copMove = true;
                 }
             }
@@ -378,21 +380,32 @@ namespace wpfXbap
         }
         public int robber_moves_greedy_dumb(int copnumber)
         {
-            foreach (int item in robber.myNeighbors)
+            for (int i = 0; i < robber.myNeighbors.Count; i++)
             {
-                iterGreedyDumb++;
-                if (!ocupied.Contains(item))
+                Random rand = new Random();
+                int tmp = robber.myNeighbors[rand.Next(robber.myNeighbors.Count - 1)];
+                if (!ocupied.Contains(tmp))
                 {
-                    return item;
+                    iterGreedyDumb++;
+                    return tmp;
                 }
-            }
+             }
             return -1;
         }
         public static int robber_moves_greedy_dumb(Cop cop, Robber robber)
         {
+            for (int i = 0; i < robber.myNeighbors.Count; i++ )
+            {
+                Random rand = new Random();
+                int tmp = robber.myNeighbors[rand.Next(robber.myNeighbors.Count-1)];
+                if (tmp != cop.myNode.number)
+                {
+                    return tmp;
+                }
+            }
             foreach (int item in robber.myNeighbors)
             {
-                if (item != cop.myNode.number)
+                if (item!= cop.myNode.number)
                 {
                     return item;
                 }
@@ -663,13 +676,12 @@ namespace wpfXbap
                         alpha = alpha2;
                     }
 
-                    if (beta < alpha)
+                    if (alpha>=beta)
                     {
-                        break;
+                        return beta;
+                        
                     }
                 }
-                if (depth == startDepth)
-                    return goNode;
                 return alpha;
             }
             else
@@ -677,13 +689,11 @@ namespace wpfXbap
                 foreach (int neighbor in board.findNeighbors(oponentNode))
                 {
                     beta = Math.Min(beta, alphabeta(oponentNode, depth - 1, alpha, beta, !player, neighbor, startDepth, board));
-                    if (beta < alpha)
+                    if (alpha>=beta)
                     {
-                        break;
+                        return alpha;
                     }
                 }
-                if (depth == startDepth)
-                    return goNode;
                 return beta;
             }
         }
@@ -714,15 +724,15 @@ namespace wpfXbap
             List<int> length = new List<int>();
             if (player)
             {
-                if (node == oponentNode) return 999;
+                if (node == oponentNode) return -999;
                 length = Dijkstra(node, node, oponentNode, board);
-                return length.Count;
+                return -length.Count;
             }
             else
             {
-                if (node == oponentNode) return -999;
+                if (node == oponentNode) return 999;
                 length = Dijkstra(node, node, oponentNode, board);
-                return -(length.Count);
+                return (length.Count);
 
             }
         }

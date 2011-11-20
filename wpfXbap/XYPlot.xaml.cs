@@ -126,8 +126,6 @@ namespace wpfXbap
             }
             ((ScatterSeries)chart1.Series[4]).ItemsSource = MCTSSource;
             ((ScatterSeries)chart2.Series[4]).ItemsSource = MCTSSource2;
-            ((BarSeries)chart3.Series[0]).ItemsSource = barGraphCop;
-            ((BarSeries)chart3.Series[1]).ItemsSource = barGraphRob;
         }
 
         //private void DrawChart()

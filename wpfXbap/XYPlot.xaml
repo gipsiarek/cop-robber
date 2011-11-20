@@ -2,9 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      mc:Ignorable="d" Title="XYPlot" Height="852" Width="1265" xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit">
-    <ScrollViewer Height="987" Width="1267">
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" Title="XYPlot" xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" d:DesignHeight="852" d:DesignWidth="1265">
+    <ScrollViewer>
         <Grid Height="1073" Width="1250">
             <chartingToolkit:Chart Canvas.Left="494" Canvas.Top="34" Name="chart1" Margin="40,81,626,650" Title="Wykres" >
                 <chartingToolkit:Chart.Axes>
@@ -34,12 +33,7 @@
             </chartingToolkit:Chart>
             <Button Content="Powrót do wyników" Height="25" HorizontalAlignment="Left" Margin="505,6,0,0" Name="btnWyniki" VerticalAlignment="Top" Width="130" Click="btnWyniki_Click" />
             <Button Content="Powrót na start" Height="25" HorizontalAlignment="Left" Margin="641,6,0,0" Name="btnStart" VerticalAlignment="Top" Width="123" Click="btnStart_Click" />
-            <chartingToolkit:Chart Canvas.Left="694" Canvas.Top="34" Margin="219,439,162,233" Name="chart3">
-                <chartingToolkit:Chart.Series>
-                    <chartingToolkit:BarSeries DependentValueBinding="{Binding Path=Value}" IndependentValueBinding="{Binding Path=Key}" Title="Cop" />
-                    <chartingToolkit:BarSeries DependentValueBinding="{Binding Path=Value}" IndependentValueBinding="{Binding Path=Key}" Title="Robber" />
-                </chartingToolkit:Chart.Series>
-            </chartingToolkit:Chart>
+            
         </Grid>
     </ScrollViewer>
 </Page>

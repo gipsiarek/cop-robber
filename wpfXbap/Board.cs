@@ -201,8 +201,146 @@ namespace wpfXbap
             neighbor = new List<List<int>>();
            
             vertex = new List<Node>();
-            for (int x = 0; x < v * h; x++)
-                neighbor.Add(new List<int>());
+            #region koperta
+            if (type == "koperta")
+            {
+                startPosX *= 2;
+                startPosX /= 3;
+                startPosY /= 4; 
+                //dodawanie wierzchołków
+                vertex.Add(point(2 * distance + startPosX, distance + startPosY, 0));
+                vertex.Add(point(distance + startPosX, distance * 2 + startPosY, 1));
+                vertex.Add(point(3 * distance + startPosX, distance * 2 + startPosY, 2));
+                vertex.Add(point(distance + startPosX, distance * 3 + startPosY, 3));
+                vertex.Add(point(3 * distance + startPosX, distance * 3 + startPosY, 4));
+                for (int x = 0; x < 6; x++)
+                {
+                    neighbor.Add(new List<int>());
+                }
+                //dodawanie krawędzi
+                neighbor[0].Add(1); neighbor[0].Add(2);
+                neighbor[1].Add(0); neighbor[1].Add(2); neighbor[1].Add(3);
+                neighbor[2].Add(0); neighbor[2].Add(1); neighbor[2].Add(4);
+                neighbor[3].Add(1); neighbor[3].Add(4);
+                neighbor[4].Add(2); neighbor[4].Add(3);
+            }
+            #endregion
+            #region bez jam
+            else if (type == "4-regularny c3")
+            {
+                startPosX /= 3;
+                startPosX *= 2;
+                startPosY /= 4;
+                vertex.Add(point( distance + startPosX, distance + startPosY , 0));
+                vertex.Add(point(5* distance + startPosX, distance + startPosY, 1));
+                vertex.Add(point(3*distance + startPosX, 2*distance + startPosY, 2));
+                vertex.Add(point(2.5*distance + startPosX, 3*distance + startPosY, 3));
+                vertex.Add(point(3.5*distance + startPosX, 3*distance + startPosY, 4));
+                vertex.Add(point(3*distance + startPosX, 6*distance + startPosY, 5));
+                for (int x = 0; x < 7; x++)
+                {
+                    neighbor.Add(new List<int>());
+                }
+                neighbor[0].Add(1); neighbor[0].Add(2); neighbor[0].Add(3); neighbor[0].Add(5);
+                neighbor[1].Add(0); neighbor[1].Add(2); neighbor[1].Add(4); neighbor[1].Add(5);
+                neighbor[2].Add(0); neighbor[2].Add(1); neighbor[2].Add(3); neighbor[2].Add(4);
+                neighbor[3].Add(0); neighbor[3].Add(2); neighbor[3].Add(4); neighbor[3].Add(5);
+                neighbor[4].Add(1); neighbor[4].Add(2); neighbor[4].Add(3); neighbor[4].Add(5);
+                neighbor[5].Add(0); neighbor[5].Add(1); neighbor[5].Add(3); neighbor[5].Add(4);
+            }
+            #endregion
+            #region petersen
+            else if (type == "petersen")
+            {
+                startPosX *= 2;
+                startPosX /= 3;
+                startPosY /= 4; 
+             
+                vertex.Add(point(4*distance + startPosX, distance + startPosY, 0));
+                vertex.Add(point(4 * distance + startPosX, 2*distance + startPosY, 1));
+                vertex.Add(point(1 * distance + startPosX, 3 * distance + startPosY, 2));
+                vertex.Add(point(2 * distance + startPosX, 3 * distance + startPosY, 3));
+                vertex.Add(point(6 * distance + startPosX, 3 * distance + startPosY, 4));
+                vertex.Add(point(7 * distance + startPosX, 3 * distance + startPosY, 5));
+                vertex.Add(point(3 * distance + startPosX, 5 * distance + startPosY, 6));
+                vertex.Add(point(5 * distance + startPosX, 5 * distance + startPosY, 7));
+                vertex.Add(point(2 * distance + startPosX, 6 * distance + startPosY, 8));
+                vertex.Add(point(6 * distance + startPosX, 6 * distance + startPosY, 9));
+                for (int x = 0; x < 10; x++)
+                {
+                    neighbor.Add(new List<int>());
+                }
+                neighbor[0].Add(1); neighbor[0].Add(2); neighbor[0].Add(5);
+                neighbor[1].Add(0); neighbor[1].Add(6); neighbor[1].Add(7);
+                neighbor[2].Add(0); neighbor[2].Add(3); neighbor[2].Add(8);
+                neighbor[3].Add(2); neighbor[3].Add(4); neighbor[3].Add(7);
+                neighbor[4].Add(3); neighbor[4].Add(5); neighbor[4].Add(6);
+                neighbor[5].Add(0); neighbor[5].Add(4); neighbor[5].Add(9);
+                neighbor[6].Add(1); neighbor[6].Add(4); neighbor[6].Add(8);
+                neighbor[7].Add(1); neighbor[7].Add(3); neighbor[7].Add(9);
+                neighbor[8].Add(2); neighbor[8].Add(6); neighbor[8].Add(9);
+                neighbor[9].Add(5); neighbor[9].Add(7); neighbor[9].Add(8);
+            }
+            #endregion
+            #region dwunastoscian
+            else if (type == "dwunastoscian")
+            {
+                                startPosX *= 2;
+                startPosX /= 5;
+                startPosY /= 4;
+
+                vertex.Add(point(5 * distance + startPosX, 1 * distance + startPosY, 0));
+                vertex.Add(point(5 * distance + startPosX, 2 * distance + startPosY, 1));
+                vertex.Add(point(1 * distance + startPosX, 4 * distance + startPosY, 2));
+                vertex.Add(point(3 * distance + startPosX, 3 * distance + startPosY, 3));
+                vertex.Add(point(7 * distance + startPosX, 3 * distance + startPosY, 4));
+                vertex.Add(point(9 * distance + startPosX,4 * distance + startPosY, 5));
+                vertex.Add(point(2 * distance + startPosX,4.5* distance + startPosY, 6));
+                vertex.Add(point(4 * distance + startPosX, 4 * distance + startPosY, 7));
+                vertex.Add(point(6 * distance + startPosX, 4 * distance + startPosY, 8));
+                vertex.Add(point(8 * distance + startPosX,4.5* distance + startPosY, 9));
+                vertex.Add(point(2.5* distance + startPosX,6* distance + startPosY, 10));
+                vertex.Add(point(3.5 * distance + startPosX, 5.5 * distance + startPosY, 11));
+                vertex.Add(point(6.5 * distance + startPosX, 5.5 * distance + startPosY, 12));
+                vertex.Add(point(7.5 * distance + startPosX, 6 * distance + startPosY, 13));
+                vertex.Add(point(5 * distance + startPosX, 6.5 * distance + startPosY, 14));
+                vertex.Add(point(2 * distance + startPosX, 9 * distance + startPosY, 15));
+                vertex.Add(point(3 * distance + startPosX, 7.5 * distance + startPosY, 16));
+                vertex.Add(point(5 * distance + startPosX, 8 * distance + startPosY, 17));
+                vertex.Add(point(7 * distance + startPosX, 7.5 * distance + startPosY, 18));
+                vertex.Add(point(8 * distance + startPosX, 9 * distance + startPosY, 19));
+                for (int x = 0; x < 20; x++)
+                {
+                    neighbor.Add(new List<int>());
+                }
+                neighbor[0].Add(2); neighbor[0].Add(1); neighbor[0].Add(5);
+                neighbor[1].Add(0); neighbor[1].Add(3); neighbor[1].Add(4);
+                neighbor[2].Add(0); neighbor[2].Add(6); neighbor[2].Add(15);
+                neighbor[3].Add(1); neighbor[3].Add(6); neighbor[3].Add(7);
+                neighbor[4].Add(1); neighbor[4].Add(8); neighbor[4].Add(9);
+                neighbor[5].Add(0); neighbor[5].Add(9); neighbor[5].Add(19);
+                neighbor[6].Add(2); neighbor[6].Add(3); neighbor[6].Add(10);
+                neighbor[7].Add(3); neighbor[7].Add(8); neighbor[7].Add(11);
+                neighbor[8].Add(4); neighbor[8].Add(7); neighbor[8].Add(12);
+                neighbor[9].Add(4); neighbor[9].Add(5); neighbor[9].Add(13);
+                neighbor[10].Add(6); neighbor[10].Add(11); neighbor[10].Add(16);
+                neighbor[11].Add(7); neighbor[11].Add(10); neighbor[11].Add(14);
+                neighbor[12].Add(8); neighbor[12].Add(13); neighbor[12].Add(14);
+                neighbor[13].Add(9); neighbor[13].Add(12); neighbor[13].Add(18);
+                neighbor[14].Add(11); neighbor[14].Add(12); neighbor[14].Add(17);
+                neighbor[15].Add(2); neighbor[15].Add(16); neighbor[15].Add(19);
+                neighbor[16].Add(10); neighbor[16].Add(15); neighbor[16].Add(17);
+                neighbor[17].Add(14); neighbor[17].Add(16); neighbor[17].Add(18);
+                neighbor[18].Add(13); neighbor[18].Add(17); neighbor[18].Add(19);
+                neighbor[19].Add(5); neighbor[19].Add(15); neighbor[19].Add(18);
+
+            }
+            #endregion
+            else
+            {
+                for (int x = 0; x < v * h; x++)
+                    neighbor.Add(new List<int>());
+            }
             if(type=="c3")
             for (int i = 0; i < h*v; i++)
             {
@@ -235,6 +373,7 @@ namespace wpfXbap
                 }
 
         }
+
         private void generateTestGraph(int nodeNumber, out int verticies, int maxNodeSt)
         {
             neighbor = new List<List<int>>();

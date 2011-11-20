@@ -49,9 +49,12 @@ namespace wpfXbap
         private void UserGame_OnLoad()
         {
             checkboard.Children.Clear();
-            gWidth = Convert.ToInt32(Application.Current.Properties["gWidth"]);
-            gHeight = Convert.ToInt32(Application.Current.Properties["gHeight"]);
             gType = Convert.ToString(Application.Current.Properties["gType"]);
+
+            gWidth = (gType == "koperta" || gType == "4-regularny c3" || gType == "dwunastoscian" || gType=="petersen") ? 0 : Convert.ToInt32(Application.Current.Properties["gWidth"]);
+
+            gHeight = (gType == "koperta" || gType == "4-regularny c3" || gType == "dwunastoscian" || gType == "petersen") ? 0 : Convert.ToInt32(Application.Current.Properties["gHeight"]);
+           
             gAlgorithm = Convert.ToString(Application.Current.Properties["gAlgorithm"]);
             nodenumber = gHeight * gWidth;
             board = new Board(gWidth, gHeight, gType, (int)checkboard.Width, (int)checkboard.Height);
@@ -250,7 +253,16 @@ namespace wpfXbap
              if(gAlgorithm.Equals("zachłanny")){
                  nodetoGo = Tests.robber_moves_greedy_dumb(cop, robber);
              } else if(gAlgorithm.Equals("alfa-beta")){
-                nodetoGo = Tests.alphabeta(robber.ocpupiedNode, 5, -999, 999, true, cop.ocupiedNode, 5, board);
+                 int value=-200, maxValue=200;
+                 foreach (int item in robber.myNeighbors)
+                 {
+                     value = Tests.alphabeta(item, 3, -999, 999, true, cop.ocupiedNode, 3, board);
+                     if (value > maxValue || value == 0)
+                     {
+                         nodetoGo = item;
+                         maxValue = value;
+                     }
+                 }
              } else if(gAlgorithm.Equals("latarnie morskie")){
                  nodetoGo = Tests.robber_moves_randomBeacon(board, 10, 5, robber, cop);
              }

@@ -150,9 +150,16 @@ namespace wpfXbap
         {
             List<string> edgeTypeList = new List<string>();
             edgeTypeList.Add("c3");
-            edgeTypeList.Add("c4");
+            edgeTypeList.Add("c4");         
             edgeTypeList.Add("random");
+            edgeTypeList.Add("koperta");
+            edgeTypeList.Add("petersen");
+            edgeTypeList.Add("4-regularny c3");
+            edgeTypeList.Add("dwunastoscian");
+
+            
             cmbEdgeType.DataContext = edgeTypeList;
+            cmbEdgeType.SelectedIndex = 0;
         }
         //Item source with robber algoriths for combobox
         private void algorithmSelection()
@@ -164,6 +171,7 @@ namespace wpfXbap
             algorithms.Add("alfa-beta");
             algorithms.Add("MCTS");
             cmbAlgorithm.DataContext = algorithms;
+            cmbAlgorithm.SelectedIndex = 0;
         }
         /// <summary>
         /// Geting all informations from checkboxes textboxes etc.

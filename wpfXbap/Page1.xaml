@@ -7,13 +7,13 @@
     <Grid Width="996" Height="600">
         <TextBlock Height="40" HorizontalAlignment="Left" Margin="252,12,0,0" Name="textBlock1" Text="Cops And Robbers THE GAME" VerticalAlignment="Top" Width="504" FontSize="24" TextAlignment="Center" FontWeight="Bold" FontStyle="Italic" />
         <Grid Height="328" HorizontalAlignment="Left" Margin="48,80,0,0" Name="grid1" VerticalAlignment="Top" Width="296" Background="#FFEFC1C1">
-            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,44,0,0" Name="txbGraphWidth" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphWidth_LostFocus" DataContext="{Binding}" />
+            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,44,0,0" Name="txbGraphWidth" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphWidth_LostFocus" DataContext="{Binding}" Text="4" />
             <Label Content="Szerokość planszy" Height="28" HorizontalAlignment="Left" Margin="28,44,0,0" Name="label4" VerticalAlignment="Top" />
             <Label Content="Wysokość planszy" Height="28" HorizontalAlignment="Left" Margin="28,78,0,0" Name="label5" VerticalAlignment="Top" IsEnabled="True" />
-            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,78,0,0" Name="txbGraphHeight" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphHeight_LostFocus" />
+            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,78,0,0" Name="txbGraphHeight" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphHeight_LostFocus" Text="3" />
             <Button Content="Stwórz" Height="23" HorizontalAlignment="Left" Margin="108,223,0,0" Name="btnDrawGraph" VerticalAlignment="Top" Width="75" Click="btnDrawGraph_Click" />
             <Label Content="Rodzaj grafu" Height="28" HorizontalAlignment="Left" Margin="28,141,0,0" Name="label6" VerticalAlignment="Top" />
-            <ComboBox Height="23" HorizontalAlignment="Left" Margin="144,145,0,0" Name="cmbEdgeType" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}" />
+            <ComboBox Height="23" HorizontalAlignment="Left" Margin="144,144,0,0" Name="cmbEdgeType" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}" />
             <ComboBox Height="23" HorizontalAlignment="Left" Margin="144,178,0,0" Name="cmbAlgorithm" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}"/>
             <Label Content="Play yourself" Height="32" HorizontalAlignment="Left" Margin="78,6,0,0" Name="label1" VerticalAlignment="Top" Width="136" FontSize="16" FontWeight="Bold" />
             <Label Content="maxymalne wymiary 20x14" Height="28" HorizontalAlignment="Left" Margin="66,111,0,0" Name="label11" VerticalAlignment="Top" Width="166" />
