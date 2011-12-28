@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      mc:Ignorable="d" Title="Page1" d:DesignHeight="1035" d:DesignWidth="995">
+      mc:Ignorable="d" Title="Page1" d:DesignHeight="1035" d:DesignWidth="995" Loaded="Page_Loaded">
     <ScrollViewer>
     <Grid Width="996" Height="1034">
         <TextBlock Height="40" HorizontalAlignment="Left" Margin="252,12,0,0" Name="textBlock1" Text="Cops And Robbers THE GAME" VerticalAlignment="Top" Width="504" FontSize="24" TextAlignment="Center" FontWeight="Bold" FontStyle="Italic" />

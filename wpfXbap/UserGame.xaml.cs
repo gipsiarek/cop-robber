@@ -228,11 +228,7 @@ namespace wpfXbap
          {
              if (who == "cop")
              {
-                 MessageBox.Show("Cop is the winner! robber is going to JAIL!!");
-             }
-             else
-             {
-                 MessageBox.Show("Robber cachs cop.... WTF?");
+                 MessageBox.Show("Gratulacje złapałeś złodzieja !");
              }
              Application.Current.Properties.Remove("gWidth");
              Application.Current.Properties.Remove("gHeight");
@@ -288,6 +284,14 @@ namespace wpfXbap
 
         
         #endregion
+
+         private void Page_Loaded(object sender, RoutedEventArgs e)
+         {
+             MessageBox.Show(@"
+Uwaga! Aby rozpocząć rozgrywkę należy umieścić policjanta na grafie klikając na wybrany wierzchołek.
+Następnie należy umieścić złodzieja. Nie może on stać na wierzchołku zajmowanym przez policjanta. Przemieszczaj się
+policjantem i spróbuj złapać złodzieja wybierając wierzchołki połączone krawędzią z Twoją aktualną pozycją.");
+         }
 
          
               

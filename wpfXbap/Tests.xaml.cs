@@ -974,9 +974,9 @@ namespace wpfXbap
         /// </summary>
         private void runRobberRun(int testNumber)
         {
-            FileStream fs = new FileStream(@"d:\test.txt", FileMode.OpenOrCreate, FileAccess.Write);
-            StreamWriter sw = new StreamWriter(fs);
-            sw.BaseStream.Seek(0, SeekOrigin.End); 
+            //FileStream fs = new FileStream(@"c:\tmp.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            //StreamWriter sw = new StreamWriter(fs);
+            //sw.BaseStream.Seek(0, SeekOrigin.End); 
             outputClass output = null;
             for (int i = 0; i < testNumber; i++)
             {
@@ -991,13 +991,13 @@ namespace wpfXbap
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
                         output = greedy_dumb_1vsMany(tmp);
-                        sw.WriteLine(output.ToString());
+                        //sw.WriteLine(output.ToString());
                         resetCops();
                     }
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
                         output = greedy_dijkstra_1vs_many(tmp);
-                        sw.WriteLine(output.ToString());
+                        //sw.WriteLine(output.ToString());
                         resetCops();
                     }
                 }
@@ -1006,7 +1006,7 @@ namespace wpfXbap
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
                         output = randomBeacon(txbBeaconRandom, txbGoOnTime, tmp);
-                        sw.WriteLine(output.ToString());
+                        //sw.WriteLine(output.ToString());
                         resetCops();
                     }
 
@@ -1016,7 +1016,7 @@ namespace wpfXbap
                     for (int tmp = txbAlfaBetaDepthMin; tmp <= txbAlfaBetaDepthMax; tmp++)
                     {
                         output = alphaBetavsGreedy(tmp, 1);
-                        sw.WriteLine(output.ToString());
+                        //sw.WriteLine(output.ToString());
                         resetCops();
                     }
                 }
@@ -1025,24 +1025,22 @@ namespace wpfXbap
                     for (int tmp = txbIloscGoniacych; tmp <= txbIloscGoniacychMax; tmp++)
                     {
                         output = MCTS(txbTreeWidth, txbTreeDepth, tmp);
-                        sw.WriteLine(output.ToString());
+                        //sw.WriteLine(output.ToString());
                         resetCops();
                     }
                 }
                 #endregion
             }
-            sw.Flush();
-            sw.Close();
-            fs.Close();
+            //sw.Flush();
+            //sw.Close();
+            //fs.Close();
         }
 
         /// <summary>
         /// automatic test for all algorithm! Takes long time to finish
         /// only for magisterka
         /// </summary>
-  
-
-        private void checkClassOfGraph()
+          private void checkClassOfGraph()
         {
             Board.removePitfalls(board);
             foreach (List<int> tmp in board.neighborForClass)

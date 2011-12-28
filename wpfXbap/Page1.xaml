@@ -6,51 +6,63 @@
       mc:Ignorable="d" Title="Page1" Height="600" Width="995" LostFocus="txbMaxNodeSt_LostFocus">
     <Grid Width="996" Height="600">
         <TextBlock Height="40" HorizontalAlignment="Left" Margin="252,12,0,0" Name="textBlock1" Text="Cops And Robbers THE GAME" VerticalAlignment="Top" Width="504" FontSize="24" TextAlignment="Center" FontWeight="Bold" FontStyle="Italic" />
-        <Grid Height="328" HorizontalAlignment="Left" Margin="48,80,0,0" Name="grid1" VerticalAlignment="Top" Width="296" Background="#FFEFC1C1">
-            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,44,0,0" Name="txbGraphWidth" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphWidth_LostFocus" DataContext="{Binding}" Text="4" />
-            <Label Content="Szerokość planszy" Height="28" HorizontalAlignment="Left" Margin="28,44,0,0" Name="label4" VerticalAlignment="Top" />
-            <Label Content="Wysokość planszy" Height="28" HorizontalAlignment="Left" Margin="28,78,0,0" Name="label5" VerticalAlignment="Top" IsEnabled="True" />
-            <TextBox Height="23" HorizontalAlignment="Left" Margin="144,78,0,0" Name="txbGraphHeight" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphHeight_LostFocus" Text="3" />
-            <Button Content="Stwórz" Height="23" HorizontalAlignment="Left" Margin="108,223,0,0" Name="btnDrawGraph" VerticalAlignment="Top" Width="75" Click="btnDrawGraph_Click" />
-            <Label Content="Rodzaj grafu" Height="28" HorizontalAlignment="Left" Margin="28,141,0,0" Name="label6" VerticalAlignment="Top" />
-            <ComboBox Height="23" HorizontalAlignment="Left" Margin="144,144,0,0" Name="cmbEdgeType" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}" />
-            <ComboBox Height="23" HorizontalAlignment="Left" Margin="144,178,0,0" Name="cmbAlgorithm" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}"/>
-            <Label Content="Play yourself" Height="32" HorizontalAlignment="Left" Margin="78,6,0,0" Name="label1" VerticalAlignment="Top" Width="136" FontSize="16" FontWeight="Bold" />
-            <Label Content="maxymalne wymiary 20x14" Height="28" HorizontalAlignment="Left" Margin="66,111,0,0" Name="label11" VerticalAlignment="Top" Width="166" />
-            <Label Content="Algorytm ucieczki" Height="28" HorizontalAlignment="Left" Margin="29,178,0,0" Name="label13" VerticalAlignment="Top" />
+        <Grid Height="473" HorizontalAlignment="Left" Margin="48,80,0,0" Name="grid1" VerticalAlignment="Top" Width="343" Background="#FFDBA243">
+            <TextBox Height="23" HorizontalAlignment="Left" Margin="163,165,0,0" Name="txbGraphWidth" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphWidth_LostFocus" DataContext="{Binding}" Text="4" ToolTip="Dla grafów C3, C4 i Random jest to liczba wierzchołków ustawionych poziomo jeden przy drugim." />
+            <Label Content="Szerokość planszy" Height="28" HorizontalAlignment="Left" Margin="47,165,0,0" Name="label4" VerticalAlignment="Top" />
+            <Label Content="Wysokość planszy" Height="28" HorizontalAlignment="Left" Margin="47,199,0,0" Name="label5" VerticalAlignment="Top" IsEnabled="True" />
+            <TextBox Height="23" HorizontalAlignment="Left" Margin="163,199,0,0" Name="txbGraphHeight" VerticalAlignment="Top" Width="120" Background="LightGray" LostFocus="txbGraphHeight_LostFocus" Text="3" ToolTip="Dla grafów C3, C4 i Random jest to liczba wierzchołków ustawionych pionowo jeden przy drugim." />
+            <Button Content="Stwórz" Height="23" HorizontalAlignment="Left" Margin="125,383,0,0" Name="btnDrawGraph" VerticalAlignment="Top" Width="75" Click="btnDrawGraph_Click" ToolTip="Utwórz graf i rozpocznij grę." />
+            <Label Content="Rodzaj grafu" Height="28" HorizontalAlignment="Left" Margin="48,279,0,0" Name="label6" VerticalAlignment="Top" />
+            <ComboBox Height="23" HorizontalAlignment="Left" Margin="164,282,0,0" Name="cmbEdgeType" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}" ToolTip="Specyfika grafu na którym zostanie rozegrana gra." />
+            <ComboBox Height="23" HorizontalAlignment="Left" Margin="164,316,0,0" Name="cmbAlgorithm" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}" ToolTip="Algorytm, którym będzie posługiwał się uciekający złodziej podczas gry." />
+            <Label Content="Zagraj samemu" Height="32" HorizontalAlignment="Left" Margin="106,8,0,0" Name="label1" VerticalAlignment="Top" Width="136" FontSize="16" FontWeight="Bold" />
+            <Label Content="maxymalne wymiary 20x14" Height="28" HorizontalAlignment="Left" Margin="85,228,0,0" Name="label11" VerticalAlignment="Top" Width="166" />
+            <Label Content="Algorytm ucieczki" Height="28" HorizontalAlignment="Left" Margin="49,316,0,0" Name="label13" VerticalAlignment="Top" />
+            <GroupBox Header="Informacje " Height="105" HorizontalAlignment="Left" Margin="14,33,0,0" Name="groupBox1" VerticalAlignment="Top" Width="323">
+                <TextBlock Height="81" Name="textBlock2" Text="W tej części aplikacji należy wybrać parametry rozgrywki z przeciwnikiem. Wciel się w policjanta (niebieski na grafie) i spróbuj złapać złodzieja (czerwony na grafie). Najedź myszką na element aby uzyskać wiecej informacji na jego temat." Width="303" TextAlignment="Justify" IsManipulationEnabled="True" ClipToBounds="False" TextWrapping="WrapWithOverflow" />
+            </GroupBox>
         </Grid>
-        <Grid Height="473" HorizontalAlignment="Left" Margin="397,80,0,0" Name="grid2" VerticalAlignment="Top" Width="583" Background="#FF65CB65">
-                <CheckBox Content="MCTS" Height="29" Name="chbMCTS" Width="120" Margin="38,299,424,145" />
-            <Border BorderBrush="Silver" BorderThickness="1" Height="62" HorizontalAlignment="Left" Margin="25,344,0,0" Name="border2" VerticalAlignment="Top" Width="544" />
-            <TextBox x:Name="txbAlfaBetaDepthMin" Width="72" Height="25" TextWrapping="Wrap" Margin="339,359,172,89" Text="1" />
-            <Label Content="Test section" Height="34" HorizontalAlignment="Left" Margin="227,6,0,0" Name="label2" VerticalAlignment="Top" Width="138" FontSize="16" FontWeight="Bold" d:LayoutOverrides="HorizontalAlignment" />
-            <Label Content="Ilość wierzchołków" Height="26" HorizontalAlignment="Left" Margin="25,67,0,0" Name="label3" VerticalAlignment="Top" Width="125" />
-            <TextBox Height="32" HorizontalAlignment="Left" Margin="178,61,0,0" Name="txbNodeNumberMin" VerticalAlignment="Top" Width="91" Text="50" LostFocus="txbNodeNumberMin_LostFocus" d:LayoutOverrides="HorizontalAlignment" />
-            <TextBox Height="32" HorizontalAlignment="Left" Margin="401,61,0,0" Name="txbNodeNumberMax" Text="60" VerticalAlignment="Top" Width="91" LostFocus="txbNodeNumberMax_LostFocus" />
-            <TextBox Height="29" HorizontalAlignment="Left" Margin="178,109,0,0" Name="txbMaxNodeSt" VerticalAlignment="Top" Width="91" LostFocus="txbMaxNodeSt_LostFocus" d:LayoutOverrides="HorizontalAlignment, VerticalAlignment" Text="6" />
-            <Label Content="Ilość testów na graf" Height="29" Margin="278,110,182,0" Name="label7" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" />
-            <TextBox Height="29" HorizontalAlignment="Left" Margin="401,110,0,0" Name="txbTestNumber" VerticalAlignment="Top" Width="91" LostFocus="txbTestNumber_LostFocus" d:LayoutOverrides="VerticalAlignment" Text="5" />
-            <Button Content="Start testing" Height="23" Margin="227,415,281,0" Name="btnStartTests" VerticalAlignment="Top" Click="btnStartTests_Click" />
-            <Label Content="od" Height="28" HorizontalAlignment="Left" Margin="150,67,0,0" Name="label8" VerticalAlignment="Top" />
-            <Label Content="do" Height="28" HorizontalAlignment="Left" Margin="325.903,65,0,0" Name="label9" VerticalAlignment="Top" RenderTransformOrigin="1.577,0.571" />
-            <Label Content="max stopien wierz." Height="28" HorizontalAlignment="Left" Margin="25,110,0,0" Name="label10" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" />
-            <CheckBox x:Name="chbGreedy" HorizontalAlignment="Left" Margin="38,204,0,0" Width="120" Content="greedy" VerticalAlignment="Top" Height="29"/>
-            <CheckBox x:Name="chbBeacon" HorizontalAlignment="Left" Margin="38,0,0,195" Width="120" Content="random beacon" VerticalAlignment="Bottom" Height="29"/>
-            <CheckBox HorizontalAlignment="Left" Margin="38,0,0,83" Width="120" Content="alfa beta" VerticalAlignment="Bottom" Height="29" Name="chbAlfaBeta" />
-            <Label Margin="165,199,0,0" VerticalAlignment="Top" Height="29" Content="Ilość policjantów od/do" HorizontalAlignment="Left" Width="164"/>
-            <TextBox x:Name="txbIloscGoniacych" Margin="339,200,0,0" VerticalAlignment="Top" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" Width="72" Text="1" />
-            <Label Margin="158,0,254,195" VerticalAlignment="Bottom" Height="34" Content="liczba losowych wierzchołków"/>
-            <TextBox x:Name="txbBeaconRandom" HorizontalAlignment="Right" Margin="0,0,172,202" VerticalAlignment="Bottom" Width="72" Height="25" TextWrapping="Wrap" Text="10" />
-            <Label Margin="165,0,0,87" VerticalAlignment="Bottom" Height="29" Content="głębokość zanurzenia od/do" HorizontalAlignment="Left" Width="163" />
-            <TextBox Height="27" HorizontalAlignment="Left" Margin="491,357,0,0" Name="txbAlfaBetaDepthMax" VerticalAlignment="Top" Width="72" Text="3" />
-            <TextBox Height="25" HorizontalAlignment="Left" Margin="491,199,0,0" Name="txbIloscGoniacychMax" TextWrapping="Wrap" VerticalAlignment="Top" Width="72" Text="3" />
-            <Label Content="czas marszu" Height="28" HorizontalAlignment="Left" Margin="419,244,0,0" Name="label12" VerticalAlignment="Top" />
-            <TextBox Height="27" HorizontalAlignment="Left" Margin="491,244,0,0" Name="txbCzasMarszu" VerticalAlignment="Top" Width="72" Text="4" />
-            <Label Content="szerokość drzewa" Height="28" HorizontalAlignment="Left" Margin="178,294,0,0" Name="label14" VerticalAlignment="Top" />
-            <Label Content="wysokość" Height="28" HorizontalAlignment="Left" Margin="419,294,0,0" Name="label15" VerticalAlignment="Top" />
-            <TextBox Height="25" HorizontalAlignment="Right" Margin="0,0,172,152" Name="txbTreeWidth" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="72" Text="3" />
-            <TextBox Height="27" HorizontalAlignment="Left" Margin="491,294,0,0" Name="txbTreeDepth" VerticalAlignment="Top" Width="72" Text="4" />
-            <CheckBox Content="Automatyczne testy na różnych danych (długotrwałe)" Height="23" HorizontalAlignment="Left" Margin="135,444,0,0" Name="chbAutoTest" VerticalAlignment="Top" Width="395" />
+        <Grid Height="473" HorizontalAlignment="Left" Margin="397,80,0,0" Name="grid2" VerticalAlignment="Top" Width="583" Background="#FF52CE52">
+            <Rectangle Height="79" HorizontalAlignment="Left" Margin="284,327,0,0" Name="rectangle4" Stroke="Black" VerticalAlignment="Top" Width="248" />
+            <Rectangle Height="79" HorizontalAlignment="Left" Margin="35,327,0,0" Name="rectangle3" Stroke="Black" VerticalAlignment="Top" Width="247" />
+            <Rectangle Height="70" HorizontalAlignment="Left" Margin="35,257,0,0" Name="rectangle2" Stroke="Black" VerticalAlignment="Top" Width="247" />
+            <Rectangle Height="70" HorizontalAlignment="Left" Margin="284,257,0,0" Name="rectangle1" Stroke="Black" VerticalAlignment="Top" Width="248" />
+            <CheckBox Content="MCTS" Name="chbMCTS" Margin="59,350,467,103" ToolTip="Zaznaczenie spowoduje wykonanie testów na algorytmie Monte Carlo Tree Search." />
+            <TextBox x:Name="txbAlfaBetaDepthMin" Height="25" TextWrapping="Wrap" Margin="460,333,63,115" Text="1" ToolTip="Głębokość minimalna przeszukiwania alfa-beta" />
+            <Label Content="Przeprowadź testy" Height="34" HorizontalAlignment="Left" Margin="227,6,0,0" Name="label2" VerticalAlignment="Top" Width="158" FontSize="16" FontWeight="Bold" d:LayoutOverrides="HorizontalAlignment" />
+            <Label Content="Ilość wierzchołków" Height="26" HorizontalAlignment="Left" Margin="40,146,0,0" Name="label3" VerticalAlignment="Top" Width="125" />
+            <TextBox Height="22" HorizontalAlignment="Left" Margin="200,148,0,0" Name="txbNodeNumberMin" VerticalAlignment="Top" Width="82" Text="50" LostFocus="txbNodeNumberMin_LostFocus" d:LayoutOverrides="HorizontalAlignment" ToolTip="Minimalna liczba wierzchołków jaką będzie posiadał graf, na którym będą prowadzone testy." />
+            <TextBox Height="22" HorizontalAlignment="Left" Margin="416,148,0,0" Name="txbNodeNumberMax" Text="60" VerticalAlignment="Top" Width="82" LostFocus="txbNodeNumberMax_LostFocus" ToolTip="Maksymalna liczba wierzchołków jaką będzie posiadał graf, na którym będą prowadzone testy." />
+            <TextBox Height="22" HorizontalAlignment="Left" Margin="200,180,0,0" Name="txbMaxNodeSt" VerticalAlignment="Top" Width="82" LostFocus="txbMaxNodeSt_LostFocus" d:LayoutOverrides="HorizontalAlignment, VerticalAlignment" Text="6" ToolTip="Maksymalny stopień wierzchołka na grafie. (Wartość nie może być zbyt duża bo złodziej straci jakąkolwiek szanse na ucieczkę." />
+            <Label Content="Ilość testów na graf" Height="29" Margin="288,178,172,0" Name="label7" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" />
+            <TextBox Height="22" HorizontalAlignment="Left" Margin="416,180,0,0" Name="txbTestNumber" VerticalAlignment="Top" Width="82" LostFocus="txbTestNumber_LostFocus" d:LayoutOverrides="VerticalAlignment" Text="5" ToolTip="Ilość powtórzeń testu dla danych parametrów przy każdym algorytmie." />
+            <Button Content="Start " Height="23" Margin="255,424,253,0" Name="btnStartTests" VerticalAlignment="Top" Click="btnStartTests_Click" ToolTip="Rozpocznij testy i wyświetl wyniki." />
+            <Label Content="od" Height="28" HorizontalAlignment="Left" Margin="164,146,0,0" Name="label8" VerticalAlignment="Top" />
+            <Label Content="do" Height="28" HorizontalAlignment="Left" Margin="362,144,0,0" Name="label9" VerticalAlignment="Top" RenderTransformOrigin="1.577,0.571" />
+            <Label Content="max stopien wierz." Height="28" HorizontalAlignment="Left" Margin="36,178,0,0" Name="label10" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" />
+            <CheckBox x:Name="chbGreedy" HorizontalAlignment="Left" Margin="59,284,0,0" Width="139" Content="Algorytm zachłanny" VerticalAlignment="Top" Height="16" ToolTip="Zaznaczenie spowoduje wykonanie testów na Algorytmie zachłannym oraz algorytmie zachłannym z heurystyką Dijkstry." />
+            <CheckBox x:Name="chbBeacon" HorizontalAlignment="Left" Margin="299,0,0,170" Width="68" Content="latarnie " VerticalAlignment="Bottom" Height="19" IsThreeState="False" ToolTip="Zaznaczenie spowoduje wykonanie testów na algorytmie Latarni morskich." />
+            <CheckBox HorizontalAlignment="Right" Margin="0,0,209,103" Width="75" Content="alfa beta" VerticalAlignment="Bottom" Height="20" Name="chbAlfaBeta" ToolTip="Zaznaczenie spowoduje wykonanie testów na algorytmie alfa-beta." />
+            <Label Margin="36,208,0,0" VerticalAlignment="Top" Height="29" Content="Ilość policjantów " HorizontalAlignment="Left" Width="118"/>
+            <TextBox x:Name="txbIloscGoniacych" Margin="200,215,0,0" VerticalAlignment="Top" Height="22" TextWrapping="Wrap" HorizontalAlignment="Left" Width="82" Text="1" ToolTip="Minimalna liczba policjantów która będzie ścigać złodzieja." />
+            <Label Margin="369,0,131,187" VerticalAlignment="Bottom" Height="25" Content="losowanych"/>
+            <TextBox x:Name="txbBeaconRandom" HorizontalAlignment="Left" Margin="458,0,0,187" VerticalAlignment="Bottom" Width="62" Height="25" TextWrapping="Wrap" Text="10" ToolTip="Liczba wierzchołków losowanych przez algorytm w celu wyboru najlepszego." />
+            <Label Margin="369,0,0,113" VerticalAlignment="Bottom" Height="29" Content="głębokość min" HorizontalAlignment="Left" Width="92" />
+            <TextBox Height="27" HorizontalAlignment="Left" Margin="460,364,0,0" Name="txbAlfaBetaDepthMax" VerticalAlignment="Top" Width="60" Text="3" ToolTip="Głębokość maksymalna przeszukiwania alfa-beta" />
+            <TextBox Height="22" HorizontalAlignment="Left" Margin="416,215,0,0" Name="txbIloscGoniacychMax" TextWrapping="Wrap" VerticalAlignment="Top" Width="82" Text="3" ToolTip="Maksymalna liczba policjantów która będzie ścigać złodzieja" />
+            <Label Content="czas marszu" Height="28" HorizontalAlignment="Left" Margin="369,292,0,0" Name="label12" VerticalAlignment="Top" />
+            <TextBox Height="27" HorizontalAlignment="Left" Margin="458,292,0,0" Name="txbCzasMarszu" VerticalAlignment="Top" Width="62" Text="4" ToolTip="Czas poruszania się złodzieja wzdłuż wybranej ścieżki" />
+            <Label Content="szerokość" Height="28" HorizontalAlignment="Left" Margin="122,364,0,0" Name="label14" VerticalAlignment="Top" />
+            <Label Content="wysokość" Height="28" HorizontalAlignment="Left" Margin="124,333,0,0" Name="label15" VerticalAlignment="Top" />
+            <TextBox Height="25" HorizontalAlignment="Right" Margin="0,0,327,82" Name="txbTreeWidth" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="60" Text="3" ToolTip="Szerokość budowanego drzewa MCTS" />
+            <TextBox Height="27" HorizontalAlignment="Left" Margin="196,333,0,0" Name="txbTreeDepth" VerticalAlignment="Top" Width="60" Text="4" ToolTip="Wysokość budowanego drzewa MCTS" />
+            <GroupBox Header="Informacje" Height="83" HorizontalAlignment="Left" Margin="32,37,0,0" Name="groupBox2" VerticalAlignment="Top" Width="542">
+                <TextBlock Height="59" Name="textBlock3" Text="Sekcja w której mamy możliwość przeprowadzenia automatycznych testów. Wybierz parametry które cie interesują i kliknij &quot;Start&quot;. Aby uzyskać więcej informacji o parametrach najedź na nie myszką. " Width="527" TextWrapping="WrapWithOverflow" TextAlignment="Justify" IsManipulationEnabled="True" />
+            </GroupBox>
+            <Label Content="głębokość max" Height="29" HorizontalAlignment="Left" Margin="369,0,0,80" VerticalAlignment="Bottom" Width="92" />
+            <Label Content="do" Height="28" HorizontalAlignment="Left" Margin="362,213,0,0" Name="label16" RenderTransformOrigin="1.577,0.571" VerticalAlignment="Top" />
+            <Label Content="od" Height="28" HorizontalAlignment="Left" Margin="164,213,0,0" Name="label17" VerticalAlignment="Top" />
         </Grid>
+        <CheckBox Content="Automatyczne testy na różnych danych (długotrwałe)" Height="23" HorizontalAlignment="Left" Margin="532,565,0,0" Name="chbAutoTest" VerticalAlignment="Top" Width="395" Visibility="Hidden" />
     </Grid>
 </Page>
